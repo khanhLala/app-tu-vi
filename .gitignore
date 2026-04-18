@@ -1,0 +1,53 @@
+# IDE and OS files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Mobile (React Native / Expo)
+tuvi-mobile/node_modules/
+tuvi-mobile/.expo/
+tuvi-mobile/dist/
+tuvi-mobile/web-build/
+tuvi-mobile/npm-debug.log*
+tuvi-mobile/yarn-debug.log*
+tuvi-mobile/yarn-error.log*
+
+# Backend (Java / Maven)
+tuvi-backend/target/
+tuvi-backend/*.class
+tuvi-backend/.mvn/wrapper/maven-wrapper.jar
+tuvi-backend/.factorypath
+tuvi-backend/.project
+tuvi-backend/.settings/
+tuvi-backend/.classpath
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv
+venv/
+env/
+ENV/
+tuvi-python/venv/
+tuvi-python/__pycache__/
+
+# Environment and Secrets
+.env
+.env.local
+.env.*.local
+*.env
+tuvi-backend/.env
+tuvi-mobile/.env
+
+# Logs
+*.log
+logs/
+tuvi-backend/logs/
+
+# Optional: Databases (if any local db files are generated)
+*.db
+*.sqlite

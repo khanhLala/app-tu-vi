@@ -118,3 +118,47 @@ class TuViChart:
             if any(s == star_name for s in c['cat_tinh'] + c['hung_tinh']):
                 return i
         return -1
+
+    def to_dict(self):
+        from lib.constants import CAN, CHI
+        cuc_names = {2: "Thủy nhị cục", 3: "Mộc tam cục", 4: "Kim tứ cục", 5: "Thổ ngũ cục", 6: "Hỏa lục cục"}
+        
+        ngay_duong = self.solar_date.strftime('%d/%m/%Y %H:%M') if self.solar_date else None
+        bat_tu = f"{CAN[self.year_can]} {CHI[self.year_chi]} - {CAN[self.month_can]} {CHI[self.month_chi]} - {CAN[self.day_can]} {CHI[self.day_chi]} - {CAN[self.hour_can]} {CHI[self.hour_chi]}"
+        cuc_str = cuc_names.get(self.cuc, f"{self.cuc} cục")
+        
+        chart_data = {
+            "personal_info": {
+                "name": self.name,
+                "gender": self.gender,
+                "am_duong_nam_nu": self.am_duong_nam_nu,
+                "am_duong_ly": self.am_duong_ly,
+                "solar_date": ngay_duong,
+                "lunar_date": f"{self.d}/{self.m}/{self.y}",
+                "bat_tu": bat_tu,
+                "ban_menh": self.ban_menh,
+                "cuc": cuc_str,
+                "menh_palace": self.la_so[self.menh_idx]['name'],
+                "sao_chu_menh": self.sao_chu_menh,
+                "than_palace": self.la_so[self.than_idx]['name'],
+                "sao_chu_than": self.sao_chu_than,
+                "view_year": f"{self.view_year} ({CAN[self.view_year_can]} {CHI[self.view_year_chi]})",
+            },
+            "palaces": {}
+        }
+        
+        for i in range(12):
+            p = self.la_so[i]
+            chart_data["palaces"][str(i)] = {
+                "chi_name": p['name'],
+                "palace_name": p['palace'],
+                "chinh_tinh": p['chinh_tinh'],
+                "cat_tinh": p['cat_tinh'],
+                "hung_tinh": p['hung_tinh'],
+                "tuan_triet": p['tuan_triet'],
+                "trang_sinh": p['trang_sinh'],
+                "dai_han": p['dai_han'],
+                "tieu_han": p['tieu_han'],
+                "nguyet_han": p['nguyet_han']
+            }
+        return chart_data
