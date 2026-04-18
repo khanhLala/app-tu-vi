@@ -69,6 +69,7 @@ const MainTabs = ({ navigation }) => {
   return (
     <Tab.Navigator
       backBehavior="none"
+      sceneContainerStyle={{ backgroundColor: '#0F172A' }}
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -124,13 +125,27 @@ const MainTabs = ({ navigation }) => {
   );
 };
 
+const MyTheme = {
+  dark: true,
+  colors: {
+    primary: '#FBBF24',
+    background: '#0F172A',
+    card: '#0F172A',
+    text: '#F8FAFC',
+    border: '#334155',
+    notification: '#EF4444',
+  },
+};
+
 const AppNavigator = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={MyTheme}>
       <Stack.Navigator 
         initialRouteName="Login"
         screenOptions={{
           headerShown: false,
+          cardStyle: { backgroundColor: '#0F172A' },
+          detachPreviousScreen: false, // Giữ màn hình cũ để tránh chớp trắng khi back
         }}
       >
         <Stack.Screen name="Login" component={LoginScreen} />

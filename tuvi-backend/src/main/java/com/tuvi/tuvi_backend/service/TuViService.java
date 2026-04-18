@@ -7,7 +7,7 @@ import com.tuvi.tuvi_backend.dto.response.TuViProfileResponse;
 import com.tuvi.tuvi_backend.entity.TuViProfile;
 import com.tuvi.tuvi_backend.entity.User;
 import com.tuvi.tuvi_backend.exception.AppException;
-import com.tuvi.tuvi_backend.exception.ErrorCode;
+import com.tuvi.tuvi_backend.enums.ErrorCode;
 import com.tuvi.tuvi_backend.repository.TuViProfileRepository;
 import com.tuvi.tuvi_backend.repository.UserRepository;
 import lombok.AccessLevel;

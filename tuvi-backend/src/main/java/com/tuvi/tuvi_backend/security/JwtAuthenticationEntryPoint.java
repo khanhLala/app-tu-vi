@@ -1,5 +1,6 @@
-package com.tuvi.tuvi_backend.exception;
+package com.tuvi.tuvi_backend.security;
 
+import com.tuvi.tuvi_backend.enums.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuvi.tuvi_backend.dto.ApiResponse;
 import jakarta.servlet.ServletException;

@@ -7,7 +7,7 @@ import com.tuvi.tuvi_backend.dto.response.UserResponse;
 import com.tuvi.tuvi_backend.entity.Role;
 import com.tuvi.tuvi_backend.entity.User;
 import com.tuvi.tuvi_backend.exception.AppException;
-import com.tuvi.tuvi_backend.exception.ErrorCode;
+import com.tuvi.tuvi_backend.enums.ErrorCode;
 import com.tuvi.tuvi_backend.mapper.UserMapper;
 import com.tuvi.tuvi_backend.repository.RoleRepository;
 import com.tuvi.tuvi_backend.repository.UserRepository;

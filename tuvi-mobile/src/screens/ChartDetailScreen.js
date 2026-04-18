@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   StyleSheet, 
   View, 
@@ -18,7 +18,7 @@ import PalaceBox from '../components/PalaceBox';
 const { width } = Dimensions.get('window');
 const CELL_SIZE = width / 4;
 
-const ChartDetailScreen = ({ route, navigation }) => {
+const ChartDetailScreen = ({ navigation, route }) => {
   const { chartData, hidePrivateInfo = false } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -156,7 +156,9 @@ const ChartDetailScreen = ({ route, navigation }) => {
               <Text style={styles.infoText}>Âm lịch: {maskInfo(chartData.personal_info.lunar_date)}</Text>
           </View>
 
-          {renderGrid()}
+          <View style={styles.zoomContainer}>
+            {renderGrid()}
+          </View>
           
           {!hidePrivateInfo && (
             <TouchableOpacity 
@@ -210,7 +212,8 @@ const ChartDetailScreen = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#0F172A' },
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: '#0F172A' },
+  zoomContainer: { paddingVertical: 20 },
   navbar: {
     flexDirection: 'row',
     alignItems: 'center',

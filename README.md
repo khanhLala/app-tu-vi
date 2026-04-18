@@ -1,66 +1,74 @@
-# Phần mềm Lập Lá Số Tử Vi (App Tử Vi)
+# 🌌 Tử Vi App - Hệ thống Lập lá số & Mạng xã hội Nghiệm lý
 
-Được viết bằng Python, đây là một dự án ứng dụng mã nguồn mở hỗ trợ việc lập và an sao lá số Tử Vi cho một ngày giờ sinh cụ thể trực tiếp trên môi trường command-line.
+Chào mừng bạn đến với **Tử Vi App**, một ứng dụng toàn diện được thiết kế để lập lá số Tử Vi chính xác, lưu trữ lịch sử cá nhân và kết nối cộng đồng yêu thích huyền học.
 
-## 🌟 Tính năng nổi bật
+## 🏗️ Kiến trúc hệ thống
 
-- Chuyển đổi chính xác ngày tháng Dương Lịch sang Âm Lịch (hỗ trợ nhập cả 2 loại ngày).
-- Lập sơ đồ 12 cung chi tiết. Xác định Mệnh, Thân, Bản mệnh (Hoa Giáp), và Cục (Thủy Nhị, Mộc Tam...).
-- An đầy đủ **14 Chính Tinh** và hệ thống **hàng trăm Phụ Tinh** theo đúng quy luật cổ học Tử Vi (Vòng Thái Tuế, Lộc Tồn, Tràng Sinh, Tuần/Triệt, Tứ hóa...).
-- Tính toán tiểu hạn, đại hạn, và các **Sao Lưu** chính xác cho từng năm xem cụ thể.
-- Phân tích và hiển thị trực tiếp ra màn hình Terminal bằng giao diện màu dễ nhìn, liệt kê Cát Tinh, Hung Tinh rõ ràng.
-- Tổ chức source code tiêu chuẩn (Modular), mỗi module tách biệt, dễ dàng mở rộng sang làm Web Service.
+Ứng dụng được xây dựng theo mô hình 3 lớp (3-tier) hiện đại:
 
-## 📂 Tổ chức mã nguồn
+1.  **Backend (`tuvi-backend`)**: Spring Boot (Java 17). Quản lý người dùng, bài viết, bình luận, lượt thích, bảo mật JWT và lưu trữ lịch sử lá số vào MySQL.
+2.  **Engine (`tuvi-python`)**: FastAPI (Python). Chịu trách nhiệm thực hiện các thuật toán tính toán sao Tử Vi phức tạp và tích hợp AI.
+3.  **Mobile (`tuvi-mobile`)**: React Native (Expo). Giao diện người dùng trên di động, hiển thị lá số tương tác và feed cộng đồng.
 
-Hệ thống được chia thành các tệp tin theo chuẩn Single Responsibility (Đơn Tích Mục Đích):
+---
 
-- `tools.py`: Module chạy khởi động (Entry point).
-- `lib/models.py`: Chứa class cấu trúc hệ thống `TuViChart` xây dựng khung hệ thống các cung lá số ban đầu.
-- `lib/placer.py`: "Khối óc" chính, chứa toàn bộ thuật toán an sao được chia nhỏ (Ví dụ: `an_sao_theo_thang`, `an_tu_hoa`, `an_thai_tue`).
-- `lib/printer.py`: Trình biên dịch hiển thị (Mảng Presentation) giúp in lá số tử vi với text tô màu.
-- `lib/constants.py`: Từ điển cung mệnh, Can/Chi và các mảng danh sách sao.
-- `lib/utils.py` & `lib/lunar.py`: Các function hỗ trợ chuyển đổi tính ngày.
+## 🚀 Hướng dẫn cài đặt và Chạy
 
-## ⚙️ Cài đặt hệ thống
-
-Yêu cầu môi trường tối thiểu: **Python 3.x**
-
-Kiểm tra và cài đặt nhanh các package từ tệp requirements:
+### 1. Dịch vụ Python (Engine)
+Thực hiện tính toán lá số.
 ```bash
+cd tuvi-python
+# Cài đặt thư viện
 pip install -r requirements.txt
+# Chạy service (Port 8000)
+python api.py
 ```
 
-*(Gói thư viện bắt buộc có sãn: `lunarcalendar` để hỗ trợ module chuyển đổi Âm Dương lịch)*
-
-## 🚀 Hướng dẫn sử dụng
-
-Chạy file `tools.py` để xem chương trình hoạt động:
-
+### 2. Backend (Spring Boot)
+Quản lý dữ liệu và logic nghiệp vụ.
 ```bash
-python tools.py
+cd tuvi-backend
+# Tạo file .env dựa trên các mẫu trong code (Database, JWT, Cloudinary)
+# Chạy backend (Port 8080)
+./mvnw spring-boot:run
 ```
 
-Để lập lá số Tử Vi cho **ngày giờ sinh của riêng bạn**, bạn hãy vào file `tools.py`, phần `if __name__ == "__main__":` và tuỳ chỉnh đầu vào:
-
-```python
-# Mẫu điền thông tin:
-from tools import TuViHamSo
-
-ls = TuViHamSo(
-    name="Tên Của Bạn", 
-    day=30,          # Ngày
-    month=1,         # Tháng
-    year=2004,       # Năm
-    hour=4,          # Giờ
-    minute=10,       # Phút
-    gender=1,        # Định dạng Giới Tính (1: Nam, 2: Nữ)
-    is_lunar=False,  # False = đang nhập ngày Dương Lịch, True = đang nhập ngày Âm Lịch
-    view_year=2026   # Năm hiện tại/khoản năm bạn đang muốn xem hạn
-)
-ls.print_chart()
+### 3. Mobile (Expo)
+Giao diện người dùng.
+```bash
+cd tuvi-mobile
+# Cài đặt dependencies
+npm install
+# Chạy Expo Go
+npx expo start
 ```
 
-## 🛠 Tích hợp Web & Mở Rộng 
+---
 
-Bởi vì codebase đã được cấu trúc thành các API nhỏ lẻ (`lib/models.py`, `lib/placer.py`), bạn hoàn toàn có thể nhúng trực tiếp dữ liệu vào Framework Web như **FastAPI/Flask/Django** để trả về định dạng `JSON` cho Front-end (VD: React, Vue) vẽ lá số hiển thị một cách dễ dàng, không bị lệ thuộc vào giao diện dòng lệnh.
+## 🔐 Cấu hình Môi trường (.env)
+
+Hệ thống sử dụng các biến môi trường để bảo mật. Hãy đảm bảo bạn đã cấu hình file `.env` trong thư mục `tuvi-backend`:
+
+| Biến | Mô tả |
+| :--- | :--- |
+| `DB_URL` | URL kết nối MySQL |
+| `DB_USERNAME` | Tên đăng nhập DB |
+| `DB_PASSWORD` | Mật khẩu DB |
+| `JWT_SIGNER_KEY` | Chìa khóa ký Token (64+ ký tự) |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary Name (Lưu ảnh avatar) |
+| `CLOUDINARY_API_KEY` | Cloudinary API Key |
+| `CLOUDINARY_API_SECRET` | Cloudinary API Secret |
+
+---
+
+## ✨ Tính năng chính
+-   ✅ Lập lá số Tử Vi chính xác theo giờ/ngày/tháng/năm sinh.
+-   ✅ Lưu trữ lịch sử lá số an toàn cho từng tài khoản.
+-   ✅ Chia sẻ lá số lên cộng đồng để thảo luận.
+-   ✅ Tương tác (Like/Comment) trên các bài viết nghiệm lý.
+-   ✅ Quản lý thông tin cá nhân và bảo mật tài khoản.
+
+---
+
+## 📜 Giấy phép
+Dự án được phát triển cho mục đích học tập và nghiên cứu. Chúc bạn có những giây phút nghiệm lý thú vị!

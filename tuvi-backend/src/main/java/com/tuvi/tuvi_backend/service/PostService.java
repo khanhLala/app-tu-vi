@@ -11,7 +11,7 @@ import com.tuvi.tuvi_backend.entity.Like;
 import com.tuvi.tuvi_backend.entity.Post;
 import com.tuvi.tuvi_backend.entity.User;
 import com.tuvi.tuvi_backend.exception.AppException;
-import com.tuvi.tuvi_backend.exception.ErrorCode;
+import com.tuvi.tuvi_backend.enums.ErrorCode;
 import com.tuvi.tuvi_backend.repository.CommentRepository;
 import com.tuvi.tuvi_backend.repository.LikeRepository;
 import com.tuvi.tuvi_backend.repository.PostRepository;

@@ -1,4 +1,4 @@
-package com.tuvi.tuvi_backend.configuration;
+package com.tuvi.tuvi_backend.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

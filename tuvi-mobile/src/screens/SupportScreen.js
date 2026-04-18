@@ -52,7 +52,7 @@ const SupportScreen = ({ navigation }) => {
       }
 
       await MailComposer.composeAsync(options);
-      
+
       Alert.alert('Thông báo', 'Gửi góp ý thành công!');
       navigation.goBack();
     } catch (error) {
@@ -126,8 +126,8 @@ const SupportScreen = ({ navigation }) => {
               )}
             </View>
 
-            <TouchableOpacity 
-              style={[styles.submitBtn, loading && styles.disabledBtn]} 
+            <TouchableOpacity
+              style={[styles.submitBtn, loading && styles.disabledBtn]}
               onPress={handleSendFeedback}
               disabled={loading}
             >
@@ -148,7 +148,7 @@ const SupportScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: '#0F172A' },
   safeArea: { flex: 1 },
   header: {
     flexDirection: 'row',

@@ -42,7 +42,7 @@ const CreatePostScreen = ({ navigation }) => {
     try {
       await axiosClient.post('/posts', {
         content,
-        chartData: selectedChart ? JSON.stringify(selectedChart) : null,
+        chartData: selectedChart ? JSON.stringify(selectedChart.full_data) : null,
       });
       navigation.goBack();
     } catch (error) {
@@ -128,8 +128,8 @@ const CreatePostScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  container: { flex: 1 },
+  safeArea: { flex: 1, backgroundColor: '#0F172A' },
+  container: { flex: 1, backgroundColor: '#0F172A' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

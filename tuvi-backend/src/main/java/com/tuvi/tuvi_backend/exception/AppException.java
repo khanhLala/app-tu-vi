@@ -1,5 +1,7 @@
 package com.tuvi.tuvi_backend.exception;
 
+import com.tuvi.tuvi_backend.enums.ErrorCode;
+
 public class AppException extends RuntimeException {
     private ErrorCode errorCode;
 

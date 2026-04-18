@@ -1,6 +1,5 @@
-package com.tuvi.tuvi_backend.configuration;
+package com.tuvi.tuvi_backend.security;
 
-import com.tuvi.tuvi_backend.exception.JwtAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,10 +34,12 @@ public class SecurityConfig {
             "/api/v1/auth/**"
     };
 
+    private final CustomJwtDecoder customJwtDecoder;
     private final RequestLoggingFilter requestLoggingFilter;
 
-    public SecurityConfig(RequestLoggingFilter requestLoggingFilter) {
+    public SecurityConfig(RequestLoggingFilter requestLoggingFilter, CustomJwtDecoder customJwtDecoder) {
         this.requestLoggingFilter = requestLoggingFilter;
+        this.customJwtDecoder = customJwtDecoder;
     }
 
     @Value("${jwt.signerKey}")
@@ -56,7 +57,7 @@ public class SecurityConfig {
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwtConfigurer -> jwtConfigurer
-                        .decoder(jwtDecoder())
+                        .decoder(customJwtDecoder)
                         .jwtAuthenticationConverter(jwtAuthenticationConverter())
                 )
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint())

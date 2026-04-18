@@ -1,4 +1,4 @@
-package com.tuvi.tuvi_backend.exception;
+package com.tuvi.tuvi_backend.enums;
 
 import org.springframework.http.HttpStatus;
 

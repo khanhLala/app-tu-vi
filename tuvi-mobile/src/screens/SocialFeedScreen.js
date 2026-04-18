@@ -167,7 +167,7 @@ const SocialFeedScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#0F172A' },
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: '#0F172A' },
   center: { justifyContent: 'center', alignItems: 'center', backgroundColor: '#0F172A' },
   header: {
     paddingTop: 10,

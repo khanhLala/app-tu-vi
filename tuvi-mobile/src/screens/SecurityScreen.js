@@ -132,7 +132,7 @@ const SecurityScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: '#0F172A' },
   safeArea: { flex: 1 },
   header: {
     flexDirection: 'row',

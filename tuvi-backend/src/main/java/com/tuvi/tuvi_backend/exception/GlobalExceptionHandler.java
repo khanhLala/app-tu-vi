@@ -1,6 +1,8 @@
 package com.tuvi.tuvi_backend.exception;
 
 import com.tuvi.tuvi_backend.dto.ApiResponse;
+import com.tuvi.tuvi_backend.enums.ErrorCode;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;

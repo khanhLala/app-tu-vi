@@ -31,11 +31,29 @@ const SettingsScreen = ({ navigation }) => {
   }, [navigation]);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('token');
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
+    try {
+      const token = await AsyncStorage.getItem('token');
+      console.log('>>> DEBUG: Token retrieved for logout:', token ? 'Exists' : 'NULL');
+      
+      if (token) {
+        // Hiện thông báo để sếp biết là nó ĐANG gọi API
+        console.log('>>> DEBUG: Calling /auth/logout...');
+        await axiosClient.post('/auth/logout', { token });
+        console.log('>>> DEBUG: Logout API call SUCCESS');
+      } else {
+        console.log('>>> DEBUG: No token found in storage, skipping API call');
+      }
+    } catch (error) {
+      console.log('>>> DEBUG: Logout API ERROR:', error);
+      Alert.alert('Lỗi Logout FE', JSON.stringify(error));
+    } finally {
+      console.log('>>> DEBUG: Clearing token and resetting navigation');
+      await AsyncStorage.removeItem('token');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    }
   };
 
   const pickImage = async () => {
@@ -174,7 +192,7 @@ const SettingsScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#0F172A' },
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: '#0F172A' },
   header: { paddingTop: 10, paddingBottom: 20, alignItems: 'center', borderBottomWidth: 0.5, borderBottomColor: '#334155' },
   title: { fontSize: 18, fontWeight: 'bold', color: '#FBBF24' },
   scrollContent: { padding: 20 },

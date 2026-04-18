@@ -44,7 +44,7 @@ const ShopScreen = () => {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#0F172A' },
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: '#0F172A' },
   header: { paddingTop: 10, paddingBottom: 20, alignItems: 'center', borderBottomWidth: 0.5, borderBottomColor: '#334155' },
   title: { fontSize: 18, fontWeight: 'bold', color: '#FBBF24' },
   scrollContent: { padding: 20 },
