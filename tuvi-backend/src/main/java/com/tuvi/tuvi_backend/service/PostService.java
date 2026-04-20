@@ -38,6 +38,7 @@ public class PostService {
     UserRepository userRepository;
     LikeRepository likeRepository;
     CommentRepository commentRepository;
+    NotificationService notificationService;
     ObjectMapper objectMapper;
 
     public PostResponse createPost(PostRequest request) {
@@ -83,6 +84,15 @@ public class PostService {
                     .user(user)
                     .build();
             likeRepository.save(like);
+
+            // Notify author
+            notificationService.createNotification(
+                post.getAuthor(), 
+                user.getFirstName() + " " + user.getLastName(),
+                "đã thích bài viết của bạn",
+                "LIKE",
+                postId
+            );
         }
     }
 
@@ -101,6 +111,15 @@ public class PostService {
                 .build();
 
         commentRepository.save(comment);
+
+        // Notify author
+        notificationService.createNotification(
+            post.getAuthor(), 
+            user.getFirstName() + " " + user.getLastName(),
+            "đã bình luận về bài viết của bạn: " + request.getContent(),
+            "COMMENT",
+            postId
+        );
     }
 
     public void deletePost(String postId) {

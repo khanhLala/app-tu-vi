@@ -1,8 +1,10 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
 const axiosClient = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.0.113:8080/api/v1', // Lấy từ .env hoặc mặc định
+  baseURL: process.env.EXPO_PUBLIC_API_URL || 
+           (Platform.OS === 'web' ? 'http://localhost:8080/api/v1' : 'http://192.168.1.7:8080/api/v1'), 
   headers: {
     'Content-Type': 'application/json',
   },

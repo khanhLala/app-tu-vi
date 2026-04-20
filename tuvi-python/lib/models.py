@@ -4,6 +4,8 @@ from datetime import datetime
 from lib.lunar import convert_to_lunar, convert_to_solar
 from lib.constants import CHI, HOA_GIAP, SAO_CHU_MENH, SAO_CHU_THAN
 from lib.utils import get_jdn, move
+from sqlalchemy import Column, Integer, String
+from lib.database import Base
 
 class TuViChart:
     def __init__(self, name, day, month, year, hour, minute, gender, is_lunar=False, view_year=None):
@@ -162,3 +164,11 @@ class TuViChart:
                 "nguyet_han": p['nguyet_han']
             }
         return chart_data
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    password_hash = Column(String)
+    role = Column(String, default="user") # 'user' or 'admin'

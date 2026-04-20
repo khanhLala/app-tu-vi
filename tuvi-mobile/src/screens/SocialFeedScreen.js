@@ -138,7 +138,7 @@ const SocialFeedScreen = ({ navigation }) => {
               onDelete={() => handleDeletePost(item.id)}
               onComment={handleComment}
               currentUserId={currentUser?.id}
-              isAdmin={currentUser?.roles?.includes('ADMIN')}
+              isAdmin={currentUser?.roles?.some(role => role === 'ADMIN' || role.name === 'ADMIN')}
             />
           )}
           contentContainerStyle={styles.listContent}

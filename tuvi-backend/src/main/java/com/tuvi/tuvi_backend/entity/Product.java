@@ -13,26 +13,18 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "reports")
-public class Report {
+@Table(name = "products")
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    @Column(name = "reason")
-    String reason;
-
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    Post post;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    User reporter;
+    String name;
+    String description;
+    double price;
+    String imageUrl;
+    int stock;
 
     @CreationTimestamp
     LocalDateTime createdAt;
-
-    @Builder.Default
-    String status = "PENDING"; // PENDING, PROCESSED
 }

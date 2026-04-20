@@ -1,5 +1,6 @@
 package com.tuvi.tuvi_backend.entity;
 
+import com.tuvi.tuvi_backend.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -13,26 +14,26 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "reports")
-public class Report {
+@Table(name = "orders")
+public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    @Column(name = "reason")
-    String reason;
-
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    Post post;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
-    User reporter;
+    User user;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    Product product;
+
+    int quantity;
+    double totalAmount;
+
+    @Enumerated(EnumType.STRING)
+    OrderStatus status;
 
     @CreationTimestamp
     LocalDateTime createdAt;
-
-    @Builder.Default
-    String status = "PENDING"; // PENDING, PROCESSED
 }

@@ -13,26 +13,24 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "reports")
-public class Report {
+@Table(name = "notifications")
+public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    @Column(name = "reason")
-    String reason;
-
     @ManyToOne
-    @JoinColumn(name = "post_id")
-    Post post;
+    @JoinColumn(name = "recipient_id")
+    User recipient;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    User reporter;
+    String senderName;
+    String message;
+    String type; // LIKE, COMMENT
+    String postId;
+    
+    @Builder.Default
+    boolean isRead = false;
 
     @CreationTimestamp
     LocalDateTime createdAt;
-
-    @Builder.Default
-    String status = "PENDING"; // PENDING, PROCESSED
 }

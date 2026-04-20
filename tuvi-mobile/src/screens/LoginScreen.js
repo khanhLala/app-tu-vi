@@ -41,17 +41,37 @@ const LoginScreen = ({ navigation }) => {
         password: trimmedPassword 
       });
       
+      console.log('>>> [LOGIN] Result:', result);
+
       if (result && result.token) {
         await AsyncStorage.setItem('token', result.token);
-        Alert.alert(
-          'Thành công', 
-          'Chào mừng bạn đến với Tử Vi App!',
-          [{ text: 'Bắt đầu', onPress: () => navigation.replace('Main') }]
-        );
+        console.log('>>> [LOGIN] Token saved successfully');
+        
+        if (Platform.OS === 'web') {
+          console.log('>>> [LOGIN] WEB DETECTED - FORCING RELOAD...');
+          window.location.reload();
+        }
+      } else {
+        console.warn('>>> [LOGIN] No token in result');
+        Alert.alert('Lỗi', 'Không nhận được mã xác thực từ máy chủ.');
       }
     } catch (error) {
-      const message = error.message || 'Tên đăng nhập hoặc mật khẩu không đúng.';
-      Alert.alert('Lỗi đăng nhập', message);
+      console.error('>>> [LOGIN] Error Details:', error);
+      let message = 'Tên đăng nhập hoặc mật khẩu không đúng.';
+      
+      if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
+        message = 'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối mạng hoặc thử lại sau.';
+      } else if (error.detail) {
+        message = error.detail;
+      } else if (error.message) {
+        message = error.message;
+      }
+
+      if (Platform.OS === 'web') {
+          window.alert(`Lỗi đăng nhập: ${message}`);
+      } else {
+          Alert.alert('Lỗi đăng nhập', message);
+      }
     } finally {
       setLoading(false);
     }

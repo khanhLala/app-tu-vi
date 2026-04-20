@@ -62,17 +62,17 @@ public class DataInitializer {
                 log.info("Đã khởi tạo tài khoản ADMIN mẫu: admin/admin");
             }
 
-            // 3. Khởi tạo tài khoản USER mẫu
-            if (userRole != null && !userRepository.existsByUsername("user1")) {
-                User user1 = User.builder()
-                        .username("user1")
-                        .password(passwordEncoder.encode("12345678"))
+            // 4. Khởi tạo tài khoản TEST USER (Theo yêu cầu)
+            if (userRole != null && !userRepository.existsByUsername("testuser")) {
+                User testUser = User.builder()
+                        .username("testuser")
+                        .password(passwordEncoder.encode("password123"))
                         .roles(Set.of(userRole))
-                        .firstName("User")
-                        .lastName("One")
+                        .firstName("Test")
+                        .lastName("User")
                         .build();
-                userRepository.save(user1);
-                log.info("Đã khởi tạo tài khoản USER mẫu: user1/12345678");
+                userRepository.save(testUser);
+                log.info("Đã khởi tạo tài khoản TEST USER mặc định: testuser/password123");
             }
         };
     }

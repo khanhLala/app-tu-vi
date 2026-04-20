@@ -31,29 +31,8 @@ const SettingsScreen = ({ navigation }) => {
   }, [navigation]);
 
   const handleLogout = async () => {
-    try {
-      const token = await AsyncStorage.getItem('token');
-      console.log('>>> DEBUG: Token retrieved for logout:', token ? 'Exists' : 'NULL');
-      
-      if (token) {
-        // Hiện thông báo để sếp biết là nó ĐANG gọi API
-        console.log('>>> DEBUG: Calling /auth/logout...');
-        await axiosClient.post('/auth/logout', { token });
-        console.log('>>> DEBUG: Logout API call SUCCESS');
-      } else {
-        console.log('>>> DEBUG: No token found in storage, skipping API call');
-      }
-    } catch (error) {
-      console.log('>>> DEBUG: Logout API ERROR:', error);
-      Alert.alert('Lỗi Logout FE', JSON.stringify(error));
-    } finally {
-      console.log('>>> DEBUG: Clearing token and resetting navigation');
-      await AsyncStorage.removeItem('token');
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' }],
-      });
-    }
+    await AsyncStorage.removeItem('token');
+    if (window.location) window.location.reload();
   };
 
   const pickImage = async () => {
@@ -95,7 +74,7 @@ const SettingsScreen = ({ navigation }) => {
           'Content-Type': 'multipart/form-data',
         },
       });
-      setProfile(response); // Cập nhật lại profile cục bộ
+      setProfile(response);
       Alert.alert('Thành công', 'Ảnh đại diện đã được cập nhật!');
     } catch (error) {
       console.log('Upload error:', error);
@@ -148,12 +127,6 @@ const SettingsScreen = ({ navigation }) => {
               <Text style={styles.profileName} allowFontScaling={false}>{profile ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || profile.username : '...'}</Text>
               <Text style={styles.profileEmail}>{profile ? `ID: ${profile.id.substring(0, 8)}` : 'Đang tải...'}</Text>
             </View>
-            <TouchableOpacity 
-              style={styles.editBtn} 
-              onPress={() => navigation.navigate('EditProfile', { profile })}
-            >
-              <Text style={styles.editBtnText} allowFontScaling={false}>Sửa</Text>
-            </TouchableOpacity>
           </View>
 
           <View style={styles.section}>
@@ -205,8 +178,6 @@ const styles = StyleSheet.create({
   profileInfo: { flexShrink: 1, flexGrow: 1, marginLeft: 16, marginRight: 8 },
   profileName: { color: '#F8FAFC', fontSize: 18, fontWeight: 'bold' },
   profileEmail: { color: '#94A3B8', fontSize: 14, marginTop: 2 },
-  editBtn: { backgroundColor: 'rgba(251, 191, 36, 0.1)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12, minWidth: 60, alignItems: 'center' },
-  editBtnText: { color: '#FBBF24', fontSize: 14, fontWeight: 'bold' },
   section: { marginBottom: 30 },
   sectionTitle: { color: '#64748B', fontSize: 12, fontWeight: 'bold', marginBottom: 12, marginLeft: 4 },
   item: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(30, 41, 59, 0.5)', padding: 16, borderRadius: 16, marginBottom: 8 },
@@ -215,7 +186,6 @@ const styles = StyleSheet.create({
   itemLabel: { color: '#F8FAFC', fontSize: 15 },
   logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 10, padding: 16 },
   logoutText: { color: '#EF4444', fontSize: 16, fontWeight: 'bold', marginLeft: 8 },
-  version: { textAlign: 'center', color: '#64748B', fontSize: 12, marginTop: 20, marginBottom: 40 },
 });
 
 export default SettingsScreen;

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Calendar, Clock, User, ChevronRight, History } from 'lucide-react-native';
+import { User, ChevronRight, History } from 'lucide-react-native';
 import axiosClient from '../api/axiosClient';
 import { saveProfile } from '../api/profileStorage';
 
@@ -49,7 +49,6 @@ const CreateChartScreen = ({ navigation }) => {
       });
 
       if (result) {
-        // Tự động lưu vào lịch sử Local
         await saveProfile(result);
         navigation.navigate('ChartDetail', { chartData: result });
       }
@@ -168,9 +167,7 @@ const CreateChartScreen = ({ navigation }) => {
                   />
                 </View>
               </View>
-              
               <View style={{ width: 20 }} />
-  
               <View style={{ flex: 1 }}>
                 <Text style={styles.label}>Năm xem hạn</Text>
                 <TextInput
