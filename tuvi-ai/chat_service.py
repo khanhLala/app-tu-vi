@@ -26,8 +26,7 @@ load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 # ── Cấu hình Gemini ───────────────────────────────────────────────
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GEMINI_MODEL   = "models/gemini-2.5-flash"   # Quota tốt hơn, phù hợp free tier
-
+GEMINI_MODEL   = "models/gemini-flash-latest"  
 # ── Đường dẫn knowledge base ─────────────────────────────────────────────────
 KB_PATH = os.path.join(os.path.dirname(__file__), "knowledge", "knowledge_base.json")
 
