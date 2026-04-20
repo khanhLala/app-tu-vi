@@ -1,0 +1,6 @@
+lunarcalendar
+fastapi
+uvicorn
+pydantic
+google-generativeai
+python-dotenv
