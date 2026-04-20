@@ -17,15 +17,16 @@ import re
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding='utf-8')
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from dotenv import load_dotenv
 
 # Load biến môi trường từ .env cùng thư mục
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
-# ── Cấu hình Gemini ───────────────────────────────────────────────────────────
+# ── Cấu hình Gemini ───────────────────────────────────────────────
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GEMINI_MODEL   = "gemini-1.5-flash"   # Miễn phí, nhanh
+GEMINI_MODEL   = "gemini-2.0-flash"   # Model mới nhất, miễn phí
 
 # ── Đường dẫn knowledge base ─────────────────────────────────────────────────
 KB_PATH = os.path.join(os.path.dirname(__file__), "knowledge", "knowledge_base.json")
@@ -197,11 +198,10 @@ def chat(
     if not GEMINI_API_KEY:
         raise ValueError("Chưa cấu hình GEMINI_API_KEY trong file .env")
 
-    # 1. Cấu hình API key
-    genai.configure(api_key=GEMINI_API_KEY)
+    # 1. Khởi tạo client với SDK mới
+    client = genai.Client(api_key=GEMINI_API_KEY)
 
     # 2. Tìm chunks liên quan
-    # Kết hợp câu hỏi hiện tại + tin nhắn cuối trong history để search tốt hơn
     search_query = message
     if history:
         last_user = next((h["parts"] for h in reversed(history) if h["role"] == "user"), "")
@@ -211,27 +211,28 @@ def chat(
     # 3. Xây dựng system prompt
     system_prompt = _build_system_prompt(chart_prompt, knowledge_chunks)
 
-    # 4. Khởi tạo model với system instruction
-    model = genai.GenerativeModel(
-        model_name=GEMINI_MODEL,
-        system_instruction=system_prompt,
-        generation_config={
-            "temperature": 0.7,
-            "max_output_tokens": 2048,
-        }
+    # 4. Chuẩn bị lịch sử hội thoại theo định dạng SDK mới
+    contents = []
+    for msg in history:
+        role = msg.get("role", "user")
+        parts = [types.Part.from_text(text=msg.get("parts", ""))]
+        contents.append(types.Content(role=role, parts=parts))
+
+    # Thêm câu hỏi hiện tại
+    contents.append(types.Content(
+        role="user",
+        parts=[types.Part.from_text(text=message)]
+    ))
+
+    # 5. Gọi Gemini với system_instruction
+    response = client.models.generate_content(
+        model=GEMINI_MODEL,
+        contents=contents,
+        config=types.GenerateContentConfig(
+            system_instruction=system_prompt,
+            temperature=0.7,
+            max_output_tokens=2048,
+        )
     )
 
-    # 5. Bắt đầu phiên chat với lịch sử
-    # Gemini yêu cầu history có dạng [{"role": "user"/"model", "parts": ["text"]}]
-    formatted_history = []
-    for msg in history:
-        formatted_history.append({
-            "role": msg.get("role", "user"),
-            "parts": [msg.get("parts", "")]
-        })
-
-    chat_session = model.start_chat(history=formatted_history)
-
-    # 6. Gửi tin nhắn và lấy kết quả
-    response = chat_session.send_message(message)
     return response.text
