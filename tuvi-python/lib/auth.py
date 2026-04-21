@@ -58,10 +58,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
 
 class RoleChecker:
     def __init__(self, allowed_roles: list):
-        self.allowed_roles = allowed_roles
+        self.allowed_roles = [r.upper() for r in allowed_roles]
 
     def __call__(self, user: User = Depends(get_current_user)):
-        if user.role not in self.allowed_roles:
+        user_role_names = [r.name.upper() for r in user.roles]
+        if not any(role in self.allowed_roles for role in user_role_names):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You do not have enough permissions to access this resource"

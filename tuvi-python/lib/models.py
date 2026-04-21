@@ -165,8 +165,25 @@ class TuViChart:
             }
         return chart_data
 
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Table, ForeignKey
+from sqlalchemy.orm import relationship
+from lib.database import Base
 import uuid
-from sqlalchemy import Column, Integer, String, Boolean
+from datetime import datetime
+
+# Association table for User and Role (Many-to-Many)
+user_roles = Table(
+    "user_roles",
+    Base.metadata,
+    Column("user_id", String(255), ForeignKey("users.id"), primary_key=True),
+    Column("role_name", String(255), ForeignKey("roles.name"), primary_key=True),
+    extend_existing=True
+)
+
+class Role(Base):
+    __tablename__ = "roles"
+    name = Column(String(255), primary_key=True)
+    description = Column(String(255))
 
 class User(Base):
     __tablename__ = "users"
@@ -178,5 +195,20 @@ class User(Base):
     last_name = Column(String(255))
     email = Column(String(255), unique=True)
     phone = Column(String(255))
+    address = Column(String(255))
+    avatar_url = Column(String(255))
+    dob = Column(DateTime) # date in DB, but DateTime works with SQLAlchemy better if we need time
     is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    roles = relationship("Role", secondary=user_roles, lazy="joined")
+
+    @property
+    def role(self):
+        """Compatibility property to return the first role name (uppercase)"""
+        if self.roles:
+            return self.roles[0].name
+        return "USER"
 

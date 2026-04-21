@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from lib.database import get_db
-from lib.models import User, TuViChart
+from lib.models import User, TuViChart, Role
 from lib.auth import get_password_hash, verify_password, create_access_token, get_current_user, RoleChecker
 from lib.placer import build_full_chart
 
@@ -30,8 +30,11 @@ app.add_middleware(
 class UserCreate(BaseModel):
     username: str = Field(..., max_length=50)
     password: str = Field(..., max_length=72)
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
+    role: Optional[str] = "user"
     is_active: bool = True
 
 
@@ -62,8 +65,20 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     new_user = User(
         username=user.username,
         password_hash=get_password_hash(user.password),
-        role=user.role
+        first_name=user.first_name,
+        last_name=user.last_name,
+        email=user.email,
+        phone=user.phone,
+        is_active=user.is_active
     )
+    
+    # Assign Role
+    if user.role:
+        role_name = user.role.upper()
+        db_role = db.query(Role).filter(Role.name == role_name).first()
+        if db_role:
+            new_user.roles = [db_role]
+    
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -114,8 +129,11 @@ def generate_chart(request: TuViRequest):
 class UserResponse(BaseModel):
     id: str
     username: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
+    role: Optional[str] = None
     is_active: bool = True
 
     class Config:
@@ -126,10 +144,13 @@ class UserListResponse(BaseModel):
     total: int
 
 class UserUpdate(BaseModel):
+    username: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
+    email: Optional[str] = None
     phone: Optional[str] = None
     password: Optional[str] = Field(None, max_length=72)
+    role: Optional[str] = None
     is_active: Optional[bool] = None
 
 
@@ -176,9 +197,15 @@ def admin_create_user(user_data: UserCreate, db: Session = Depends(get_db), admi
         last_name=user_data.last_name,
         email=user_data.email,
         phone=user_data.phone,
-        role=user_data.role,
         is_active=user_data.is_active
     )
+
+    # Assign Role
+    if user_data.role:
+        role_name = user_data.role.upper()
+        db_role = db.query(Role).filter(Role.name == role_name).first()
+        if db_role:
+            new_user.roles = [db_role]
 
     db.add(new_user)
     db.commit()
@@ -207,8 +234,15 @@ def update_user(user_id: str, user_data: UserUpdate, db: Session = Depends(get_d
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e))
     
+    if 'role' in update_dict:
+        role_name = update_dict.pop('role').upper()
+        db_role = db.query(Role).filter(Role.name == role_name).first()
+        if db_role:
+            db_user.roles = [db_role]
+    
     for key, value in update_dict.items():
-        setattr(db_user, key, value)
+        if hasattr(db_user, key):
+            setattr(db_user, key, value)
     
     db.commit()
     db.refresh(db_user)
