@@ -188,7 +188,7 @@ const ChartDetailScreen = ({ navigation, route }) => {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>AI Analysis Prompt</Text>
+                <Text style={styles.modalTitle}>Thông tin lá số kèm prompt</Text>
                 <TouchableOpacity onPress={() => setModalVisible(false)}>
                   <X color="#94A3B8" size={24} />
                 </TouchableOpacity>
@@ -198,7 +198,7 @@ const ChartDetailScreen = ({ navigation, route }) => {
               </ScrollView>
               <TouchableOpacity style={styles.copyBtn} onPress={() => {
                 Clipboard.setString(chartData.ai_prompt);
-                Alert.alert('Thành công', 'Đã sao chép Prompt cho AI vào bộ nhớ tạm.');
+                Alert.alert('Thành công', 'Đã sao chép Prompt vào bộ nhớ tạm.');
               }}>
                 <Text style={styles.copyBtnText}>SAO CHÉP TOÀN BỘ</Text>
               </TouchableOpacity>

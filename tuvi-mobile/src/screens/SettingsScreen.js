@@ -34,7 +34,7 @@ const SettingsScreen = ({ navigation }) => {
     try {
       const token = await AsyncStorage.getItem('token');
       console.log('>>> DEBUG: Token retrieved for logout:', token ? 'Exists' : 'NULL');
-      
+
       if (token) {
         // Hiện thông báo để sếp biết là nó ĐANG gọi API
         console.log('>>> DEBUG: Calling /auth/logout...');
@@ -123,8 +123,8 @@ const SettingsScreen = ({ navigation }) => {
         </View>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.profileSection}>
-            <TouchableOpacity 
-              style={styles.avatarContainer} 
+            <TouchableOpacity
+              style={styles.avatarContainer}
               onPress={pickImage}
               disabled={uploading}
             >
@@ -148,8 +148,8 @@ const SettingsScreen = ({ navigation }) => {
               <Text style={styles.profileName} allowFontScaling={false}>{profile ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || profile.username : '...'}</Text>
               <Text style={styles.profileEmail}>{profile ? `ID: ${profile.id.substring(0, 8)}` : 'Đang tải...'}</Text>
             </View>
-            <TouchableOpacity 
-              style={styles.editBtn} 
+            <TouchableOpacity
+              style={styles.editBtn}
               onPress={() => navigation.navigate('EditProfile', { profile })}
             >
               <Text style={styles.editBtnText} allowFontScaling={false}>Sửa</Text>
@@ -158,14 +158,14 @@ const SettingsScreen = ({ navigation }) => {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>TÀI KHOẢN</Text>
-            <SettingItem 
-              icon={<User color="#94A3B8" size={20} />} 
-              label="Thông tin cá nhân" 
+            <SettingItem
+              icon={<User color="#94A3B8" size={20} />}
+              label="Thông tin cá nhân"
               onPress={() => navigation.navigate('Profile')}
             />
-            <SettingItem 
-              icon={<Shield color="#94A3B8" size={20} />} 
-              label="Bảo mật & Mật khẩu" 
+            <SettingItem
+              icon={<Shield color="#94A3B8" size={20} />}
+              label="Bảo mật & Mật khẩu"
               onPress={() => navigation.navigate('Security')}
             />
           </View>
@@ -173,9 +173,9 @@ const SettingsScreen = ({ navigation }) => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>ỨNG DỤNG</Text>
             <SettingItem icon={<Bell color="#94A3B8" size={20} />} label="Thông báo" type="switch" />
-            <SettingItem 
-              icon={<CircleHelp color="#94A3B8" size={20} />} 
-              label="Hỗ trợ & Góp ý" 
+            <SettingItem
+              icon={<CircleHelp color="#94A3B8" size={20} />}
+              label="Hỗ trợ & Góp ý"
               onPress={() => navigation.navigate('Support')}
             />
           </View>

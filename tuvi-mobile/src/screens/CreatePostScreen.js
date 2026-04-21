@@ -72,7 +72,7 @@ const CreatePostScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.content}>
         <TextInput
           style={styles.input}
-          placeholder="Bạn đang nghiệm thái gì thế?"
+          placeholder="Bạn đang muốn chia sẻ điều gì thế?"
           placeholderTextColor="#64748B"
           multiline
           value={content}

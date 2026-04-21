@@ -43,11 +43,30 @@ const LoginScreen = ({ navigation }) => {
       
       if (result && result.token) {
         await AsyncStorage.setItem('token', result.token);
-        Alert.alert(
-          'Thành công', 
-          'Chào mừng bạn đến với Tử Vi App!',
-          [{ text: 'Bắt đầu', onPress: () => navigation.replace('Main') }]
-        );
+        
+        // Kiểm tra quyền ngay sau khi login
+        try {
+          const profile = await axiosClient.get('/users/my-info');
+          const isAdmin = profile?.roles?.includes('ADMIN');
+          
+          if (isAdmin) {
+            Alert.alert(
+              'Thành công', 
+              'Chào mừng bạn quay trở lại trang quản trị!',
+              [{ text: 'Vào Dashboard', onPress: () => navigation.replace('AdminMain') }]
+            );
+          } else {
+            Alert.alert(
+              'Thành công', 
+              'Chào mừng bạn đến với Tử Vi App!',
+              [{ text: 'Bắt đầu', onPress: () => navigation.replace('Main') }]
+            );
+          }
+        } catch (infoError) {
+          console.log('Error fetching role after login:', infoError);
+          // Defaults to Main if info check fails
+          navigation.replace('Main');
+        }
       }
     } catch (error) {
       const message = error.message || 'Tên đăng nhập hoặc mật khẩu không đúng.';

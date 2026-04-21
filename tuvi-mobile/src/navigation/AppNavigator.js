@@ -20,6 +20,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import SecurityScreen from '../screens/SecurityScreen';
 import SupportScreen from '../screens/SupportScreen';
+import AdminHomeScreen from '../screens/AdminHomeScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -28,7 +29,7 @@ const Tab = createBottomTabNavigator();
 const MainTabs = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const [tabHistory, setTabHistory] = React.useState(['Calculate']);
-  
+
   // Theo dõi tab hiện tại
   const currentTab = useNavigationState(s => {
     const route = s.routes[s.index];
@@ -89,33 +90,33 @@ const MainTabs = ({ navigation }) => {
         tabBarInactiveTintColor: '#64748B',
       }}
     >
-      <Tab.Screen 
-        name="Calculate" 
-        component={CreateChartScreen} 
+      <Tab.Screen
+        name="Calculate"
+        component={CreateChartScreen}
         options={{
           tabBarLabel: ({ color }) => <Text style={{ color, fontSize: 11, fontWeight: 'bold', marginBottom: 4 }} allowFontScaling={false}>Lập lá số</Text>,
           tabBarIcon: ({ color, size }) => <Sparkles color={color} size={size} />,
         }}
       />
-      <Tab.Screen 
-        name="Shop" 
-        component={ShopScreen} 
+      <Tab.Screen
+        name="Shop"
+        component={ShopScreen}
         options={{
           tabBarLabel: ({ color }) => <Text style={{ color, fontSize: 11, fontWeight: 'bold', marginBottom: 4 }} allowFontScaling={false}>Cửa hàng</Text>,
           tabBarIcon: ({ color, size }) => <ShoppingBag color={color} size={size} />,
         }}
       />
-      <Tab.Screen 
-        name="Social" 
-        component={SocialFeedScreen} 
+      <Tab.Screen
+        name="Social"
+        component={SocialFeedScreen}
         options={{
           tabBarLabel: ({ color }) => <Text style={{ color, fontSize: 11, fontWeight: 'bold', marginBottom: 4 }} allowFontScaling={false}>Cộng đồng</Text>,
           tabBarIcon: ({ color, size }) => <Compass color={color} size={size} />,
         }}
       />
-      <Tab.Screen 
-        name="Settings" 
-        component={SettingsScreen} 
+      <Tab.Screen
+        name="Settings"
+        component={SettingsScreen}
         options={{
           tabBarLabel: ({ color }) => <Text style={{ color, fontSize: 11, fontWeight: 'bold', marginBottom: 4 }} allowFontScaling={false}>Cài đặt</Text>,
           tabBarIcon: ({ color, size }) => <Settings color={color} size={size} />,
@@ -140,7 +141,7 @@ const MyTheme = {
 const AppNavigator = () => {
   return (
     <NavigationContainer theme={MyTheme}>
-      <Stack.Navigator 
+      <Stack.Navigator
         initialRouteName="Login"
         screenOptions={{
           headerShown: false,
@@ -152,14 +153,15 @@ const AppNavigator = () => {
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
         <Stack.Screen name="History" component={ProfileListScreen} />
-        
+
         <Stack.Screen name="ChartDetail" component={ChartDetailScreen} />
         <Stack.Screen name="CreatePost" component={CreatePostScreen} />
-        
+
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="EditProfile" component={EditProfileScreen} />
         <Stack.Screen name="Security" component={SecurityScreen} />
         <Stack.Screen name="Support" component={SupportScreen} />
+        <Stack.Screen name="AdminMain" component={AdminHomeScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
