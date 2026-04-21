@@ -22,6 +22,11 @@ import SecurityScreen from '../screens/SecurityScreen';
 import SupportScreen from '../screens/SupportScreen';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
 import CartScreen from '../screens/CartScreen';
+import CheckoutScreen from '../screens/CheckoutScreen';
+import OrderSuccessScreen from '../screens/OrderSuccessScreen';
+import OrderHistoryScreen from '../screens/OrderHistoryScreen';
+import VietQRPaymentScreen from '../screens/VietQRPaymentScreen';
+import ReviewScreen from '../screens/ReviewScreen';
 import ChatScreen from '../screens/ChatScreen';
 
 
@@ -166,6 +171,11 @@ const AppNavigator = () => {
         <Stack.Screen name="Support" component={SupportScreen} />
         <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
         <Stack.Screen name="Cart" component={CartScreen} />
+        <Stack.Screen name="Checkout" component={CheckoutScreen} />
+        <Stack.Screen name="OrderSuccess" component={OrderSuccessScreen} />
+        <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+        <Stack.Screen name="VietQRPayment" component={VietQRPaymentScreen} />
+        <Stack.Screen name="Review" component={ReviewScreen} />
         <Stack.Screen name="Chat" component={ChatScreen} />
       </Stack.Navigator>
     </NavigationContainer>

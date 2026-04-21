@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Switch, ActivityIndicator, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { User, Bell, Shield, CircleHelp, LogOut, ChevronRight, Camera } from 'lucide-react-native';
+import { User, Bell, Shield, CircleHelp, LogOut, ChevronRight, Camera, ShoppingBag } from 'lucide-react-native';
 import axiosClient from '../api/axiosClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
@@ -163,9 +163,14 @@ const SettingsScreen = ({ navigation }) => {
               label="Thông tin cá nhân"
               onPress={() => navigation.navigate('Profile')}
             />
-            <SettingItem
-              icon={<Shield color="#94A3B8" size={20} />}
-              label="Bảo mật & Mật khẩu"
+            <SettingItem 
+              icon={<ShoppingBag color="#94A3B8" size={20} />} 
+              label="Đơn hàng của tôi" 
+              onPress={() => navigation.navigate('OrderHistory')}
+            />
+            <SettingItem 
+              icon={<Shield color="#94A3B8" size={20} />} 
+              label="Bảo mật & Mật khẩu" 
               onPress={() => navigation.navigate('Security')}
             />
           </View>

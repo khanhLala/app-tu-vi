@@ -1,6 +1,7 @@
 package com.tuvi.tuvi_backend.component;
 
 import com.tuvi.tuvi_backend.entity.Product;
+import com.tuvi.tuvi_backend.entity.ProductType;
 import com.tuvi.tuvi_backend.entity.Review;
 import com.tuvi.tuvi_backend.entity.User;
 import com.tuvi.tuvi_backend.repository.ProductRepository;
@@ -30,6 +31,7 @@ public class DataSeeder implements CommandLineRunner {
                     .description("Luận giải chi tiết 12 tháng, dự đoán vận hạn, cơ hội và thách thức trong năm.")
                     .imageUrl("https://images.unsplash.com/photo-1549488344-c2df8b1ec0ba?auto=format&fit=crop&w=800&q=80")
                     .category("Gói xem lá số")
+                    .type(ProductType.SERVICE)
                     .build();
 
             Product product2 = Product.builder()
@@ -38,6 +40,7 @@ public class DataSeeder implements CommandLineRunner {
                     .description("Không giới hạn số lượt lập lá số, phân tích chuyên sâu về tình duyên, sự nghiệp, tài lộc trọn đời.")
                     .imageUrl("https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=800&q=80")
                     .category("Gói xem lá số")
+                    .type(ProductType.SERVICE)
                     .build();
 
             Product product3 = Product.builder()
@@ -46,6 +49,7 @@ public class DataSeeder implements CommandLineRunner {
                     .description("Vòng tay trầm hương giúp xua đuổi tà khí, mang lại bình an và may mắn cho người đeo.")
                     .imageUrl("https://images.unsplash.com/photo-1611077543884-6946ce24803b?auto=format&fit=crop&w=800&q=80")
                     .category("Vật Phẩm Phong Thủy")
+                    .type(ProductType.PRODUCT)
                     .build();
 
             productRepository.save(product1);
