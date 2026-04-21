@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, Share2, Clipboard as CopyIcon, X } from 'lucide-react-native';
+import { ArrowLeft, Share2, Clipboard as CopyIcon, X, MessageCircle } from 'lucide-react-native';
 import PalaceBox from '../components/PalaceBox';
 
 const { width } = Dimensions.get('window');
@@ -170,6 +170,16 @@ const ChartDetailScreen = ({ navigation, route }) => {
             </TouchableOpacity>
           )}
 
+          {!hidePrivateInfo && (
+            <TouchableOpacity
+              style={styles.aiBtn}
+              onPress={() => navigation.navigate('Chat', { chartData })}
+            >
+              <MessageCircle color="#FBBF24" size={20} />
+              <Text style={styles.aiBtnText}>HỎI THẦY TỬ VI AI</Text>
+            </TouchableOpacity>
+          )}
+
           <View style={styles.legend}>
               <Text style={styles.legendTitle}>Ghi chú:</Text>
               <Text style={styles.legendItem}>• Màu đỏ: Chính tinh</Text>
@@ -274,6 +284,19 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   promptBtnText: { color: '#0F172A', fontSize: 14, fontWeight: 'bold', marginLeft: 10 },
+  aiBtn: {
+    borderColor: '#FBBF24',
+    borderWidth: 1.5,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    height: 56,
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(251,191,36,0.08)',
+  },
+  aiBtnText: { color: '#FBBF24', fontSize: 14, fontWeight: 'bold', marginLeft: 10 },
   legend: { padding: 20 },
   legendTitle: { color: '#FBBF24', fontSize: 14, fontWeight: 'bold', marginBottom: 8 },
   legendItem: { color: '#94A3B8', fontSize: 12, marginBottom: 4 },
