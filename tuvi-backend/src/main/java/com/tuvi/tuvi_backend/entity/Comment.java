@@ -22,6 +22,7 @@ public class Comment {
     @Column(name = "content", columnDefinition = "TEXT")
     String content;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @ManyToOne
     @JoinColumn(name = "post_id")
     Post post;

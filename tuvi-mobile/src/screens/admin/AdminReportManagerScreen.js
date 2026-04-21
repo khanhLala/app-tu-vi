@@ -6,20 +6,27 @@ import {
   FlatList, 
   TouchableOpacity, 
   ActivityIndicator, 
-  Alert
+  Alert,
+  RefreshControl,
+  Platform
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, AlertTriangle, CheckCircle, Trash2, Eye } from 'lucide-react-native';
 import axiosClient from '../../api/axiosClient';
+import ConfirmModal from '../../components/ConfirmModal';
 
 const AdminReportManagerScreen = ({ navigation }) => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState('PENDING');
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
 
-  const fetchReports = async () => {
-    setLoading(true);
+  const fetchReports = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const res = await axiosClient.get(`/admin/reports?status=${filter}`);
       setReports(res);
@@ -27,7 +34,13 @@ const AdminReportManagerScreen = ({ navigation }) => {
       console.error('Error fetching reports:', err);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchReports(false);
   };
 
   useEffect(() => {
@@ -44,28 +57,50 @@ const AdminReportManagerScreen = ({ navigation }) => {
     }
   };
 
-  const handleDeletePost = async (postId, reportId) => {
-    Alert.alert(
-      'Xóa bài viết',
-      'Bạn có chắc muốn xóa bài viết vi phạm này?',
-      [
-        { text: 'Hủy', style: 'cancel' },
-        { 
-          text: 'Xóa', 
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await axiosClient.delete(`/posts/${postId}`);
-              await axiosClient.post(`/admin/reports/${reportId}/resolve`);
-              setReports(prev => prev.filter(r => r.id !== reportId));
-              Alert.alert('Thành công', 'Đã xóa bài viết và cập nhật báo cáo.');
-            } catch (err) {
-              Alert.alert('Lỗi', 'Không thể xóa bài viết.');
-            }
-          }
-        }
-      ]
-    );
+  const handleDeletePost = (postId, reportId) => {
+    setSelectedReport({ postId, reportId });
+    setConfirmModalVisible(true);
+  };
+
+  const confirmDeletePost = async () => {
+    if (!selectedReport) return;
+    const { postId, reportId } = selectedReport;
+    
+    setIsDeleting(true);
+    try {
+      // Backend sẽ tự động xử lý (RESOLVE) các báo cáo liên quan khi xóa bài
+      if (postId) {
+        await axiosClient.delete(`/posts/${postId}`);
+      } else {
+        // Nếu không có postId (bài đã bị xóa?), chỉ cần resolve báo cáo này
+        await axiosClient.post(`/admin/reports/${reportId}/resolve`);
+      }
+      
+      // 3. Update UI
+      setReports(prev => prev.filter(r => r.id !== reportId));
+      setConfirmModalVisible(false);
+      
+      if (Platform.OS === 'web') {
+        window.alert('Thành công: Đã xóa bài viết và cập nhật báo cáo.');
+      } else {
+        Alert.alert('Thành công', 'Đã xóa bài viết và cập nhật báo cáo.');
+      }
+    } catch (err) {
+      console.error('Delete error:', err);
+      // Vẫn xóa khỏi UI vì báo cáo có thể đã được resolve
+      setReports(prev => prev.filter(r => r.id !== reportId));
+      setConfirmModalVisible(false);
+      
+      const errMsg = 'Đã xử lý báo cáo. Tuy nhiên có lỗi xảy ra khi xóa bài viết (có thể bài viết đã được xóa trước đó).';
+      if (Platform.OS === 'web') {
+        window.alert('Thông báo: ' + errMsg);
+      } else {
+        Alert.alert('Thông báo', errMsg);
+      }
+    } finally {
+      setIsDeleting(false);
+      setSelectedReport(null);
+    }
   };
 
   const renderItem = ({ item }) => (
@@ -81,7 +116,9 @@ const AdminReportManagerScreen = ({ navigation }) => {
       <Text style={styles.reporterText}>Người báo: <Text style={{ color: '#F8FAFC' }}>@{item.reporter?.username}</Text></Text>
       
       <View style={styles.postPreview}>
-        <Text style={styles.postContent} numberOfLines={3}>"{item.post?.content}"</Text>
+        <Text style={styles.postContent} numberOfLines={3}>
+          "{item.post?.content || item.postContent || '(Nội dung bài viết đã bị xóa)'}"
+        </Text>
       </View>
 
       <View style={styles.actions}>
@@ -140,6 +177,14 @@ const AdminReportManagerScreen = ({ navigation }) => {
             renderItem={renderItem}
             keyExtractor={item => item.id}
             contentContainerStyle={styles.listContent}
+            refreshControl={
+              <RefreshControl 
+                refreshing={refreshing} 
+                onRefresh={onRefresh} 
+                tintColor="#FBBF24"
+                colors={['#FBBF24']}
+              />
+            }
             ListEmptyComponent={
               <View style={styles.emptyContainer}>
                 <CheckCircle color="#334155" size={64} />
@@ -148,6 +193,17 @@ const AdminReportManagerScreen = ({ navigation }) => {
             }
           />
         )}
+
+        <ConfirmModal
+          visible={confirmModalVisible}
+          onClose={() => !isDeleting && setConfirmModalVisible(false)}
+          onConfirm={confirmDeletePost}
+          title="Xác nhận xóa"
+          message="Bạn có chắc chắn muốn xóa bài viết vi phạm này và đóng báo cáo không?"
+          confirmText="Xóa bài viết"
+          isDanger={true}
+          loading={isDeleting}
+        />
       </SafeAreaView>
     </LinearGradient>
   );

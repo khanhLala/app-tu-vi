@@ -5,7 +5,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Plus } from 'lucide-react-native';
 import axiosClient from '../api/axiosClient';
 import PostCard from '../components/PostCard';
-import { Alert } from 'react-native';
+import ReportModal from '../components/ReportModal';
+import SocialCard from '../components/PostCard'; // Wait, it's imported as PostCard
+import { Alert, Platform } from 'react-native';
 
 const SocialFeedScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
@@ -13,6 +15,9 @@ const SocialFeedScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [reportingPostId, setReportingPostId] = useState(null);
+  const [isReporting, setIsReporting] = useState(false);
 
   const fetchUser = async () => {
     try {
@@ -111,6 +116,32 @@ const SocialFeedScreen = ({ navigation }) => {
       Alert.alert('Lỗi', 'Không thể gửi bình luận.');
     }
   };
+  
+  const handleReport = (postId) => {
+    setReportingPostId(postId);
+    setReportModalVisible(true);
+  };
+
+  const submitReport = async (reason) => {
+    setReportModalVisible(false);
+    setIsReporting(true);
+    try {
+      await axiosClient.post(`/posts/${reportingPostId}/report`, { reason });
+      if (Platform.OS === 'web') {
+        window.alert('Cảm ơn! Báo cáo của bạn đã được gửi cho quản trị viên xử lý.');
+      } else {
+        Alert.alert('Cảm ơn', 'Báo cáo của bạn đã được gửi cho quản trị viên xử lý.');
+      }
+    } catch (error) {
+      if (Platform.OS === 'web') {
+        window.alert('Lỗi: Không thể gửi báo cáo lúc này.');
+      } else {
+        Alert.alert('Lỗi', 'Không thể gửi báo cáo lúc này.');
+      }
+    } finally {
+      setIsReporting(false);
+    }
+  };
 
   if (loading && !refreshing) {
     return (
@@ -134,7 +165,7 @@ const SocialFeedScreen = ({ navigation }) => {
             <PostCard 
               post={item} 
               onLike={() => handleLike(item.id)}
-              onReport={() => Alert.alert('Thông báo', 'Báo cáo đã được gửi cho quản trị viên!')}
+              onReport={() => handleReport(item.id)}
               onDelete={() => handleDeletePost(item.id)}
               onComment={handleComment}
               currentUserId={currentUser?.id}
@@ -160,6 +191,12 @@ const SocialFeedScreen = ({ navigation }) => {
             <Plus color="#0F172A" size={30} />
           </TouchableOpacity>
         )}
+
+        <ReportModal 
+          visible={reportModalVisible} 
+          onClose={() => setReportModalVisible(false)} 
+          onSubmit={submitReport}
+        />
       </SafeAreaView>
     </LinearGradient>
   );

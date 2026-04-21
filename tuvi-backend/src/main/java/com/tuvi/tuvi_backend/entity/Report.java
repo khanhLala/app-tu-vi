@@ -24,6 +24,7 @@ public class Report {
 
     @ManyToOne
     @JoinColumn(name = "post_id")
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.SET_NULL)
     Post post;
 
     @ManyToOne
@@ -35,4 +36,7 @@ public class Report {
 
     @Builder.Default
     String status = "PENDING"; // PENDING, PROCESSED
+
+    @Column(columnDefinition = "TEXT")
+    String postContent;
 }

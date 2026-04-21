@@ -9,12 +9,14 @@ import com.tuvi.tuvi_backend.dto.response.PostResponse;
 import com.tuvi.tuvi_backend.entity.Comment;
 import com.tuvi.tuvi_backend.entity.Like;
 import com.tuvi.tuvi_backend.entity.Post;
+import com.tuvi.tuvi_backend.entity.Report;
 import com.tuvi.tuvi_backend.entity.User;
 import com.tuvi.tuvi_backend.exception.AppException;
 import com.tuvi.tuvi_backend.enums.ErrorCode;
 import com.tuvi.tuvi_backend.repository.CommentRepository;
 import com.tuvi.tuvi_backend.repository.LikeRepository;
 import com.tuvi.tuvi_backend.repository.PostRepository;
+import com.tuvi.tuvi_backend.repository.ReportRepository;
 import com.tuvi.tuvi_backend.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,7 @@ public class PostService {
     UserRepository userRepository;
     LikeRepository likeRepository;
     CommentRepository commentRepository;
+    ReportRepository reportRepository;
     NotificationService notificationService;
     ObjectMapper objectMapper;
 
@@ -139,7 +142,37 @@ public class PostService {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
+        // Tự động xử lý (RESOLVE) các báo cáo liên quan trước khi xóa
+        List<Report> reports = reportRepository.findAllByPost(post);
+        for (Report report : reports) {
+            report.setPostContent(post.getContent()); // Lưu nội dung bài viết vào báo cáo
+            report.setStatus("PROCESSED");
+            report.setPost(null); // QUAN TRỌNG: Ngắt liên kết để có thể xóa post mà không bị lỗi JPA
+            reportRepository.save(report);
+        }
+
+        // Đồng bộ các thay đổi lên DB trước khi xóa bài viết
+        reportRepository.flush();
+
         postRepository.delete(post);
+    }
+
+    public void reportPost(String postId, String reason) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User reporter = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Bài đăng không tồn tại"));
+
+        Report report = Report.builder()
+                .post(post)
+                .reporter(reporter)
+                .reason(reason)
+                .status("PENDING")
+                .build();
+
+        reportRepository.save(report);
     }
 
     private PostResponse mapToPostResponse(Post post, User currentUser) {

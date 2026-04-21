@@ -18,6 +18,7 @@ public class Like {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @ManyToOne
     @JoinColumn(name = "post_id")
     Post post;

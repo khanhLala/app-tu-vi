@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface ReportRepository extends JpaRepository<Report, String> {
     List<Report> findAllByStatusOrderByCreatedAtDesc(String status);
+    List<Report> findAllByPost(com.tuvi.tuvi_backend.entity.Post post);
 }
