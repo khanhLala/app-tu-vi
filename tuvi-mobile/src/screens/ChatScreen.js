@@ -105,7 +105,6 @@ const ChatScreen = ({ navigation, route }) => {
 
     try {
       const history = buildHistory(updatedMessages);
-      // Bỏ tin nhắn user vừa thêm khỏi history (vì nó là `message` hiện tại)
       const historyWithoutLast = history.slice(0, -1);
 
       const response = await axiosClient.post('/ai/chat', {
@@ -114,16 +113,22 @@ const ChatScreen = ({ navigation, route }) => {
         chart_prompt: chartPrompt,
       });
 
-      // axiosClient interceptor trả về response.data.result
       const answer = response?.answer || response?.result?.answer || 'Xin lỗi, tôi không thể trả lời lúc này.';
-
       const aiMsg = { id: (Date.now() + 1).toString(), role: 'model', parts: answer };
       setMessages(prev => [...prev, aiMsg]);
     } catch (error) {
-      const errMsg = error?.message || 'Lỗi kết nối. Vui lòng thử lại.';
-      Alert.alert('Lỗi', errMsg);
-      // Xóa tin nhắn user nếu gửi thất bại
-      setMessages(prev => prev.filter(m => m.id !== userMsg.id));
+      console.error('Lỗi gửi tin nhắn:', error);
+      
+      // Lấy thông báo lỗi từ backend (ví dụ: "Hệ thống AI đang quá tải...")
+      const errorText = error?.detail || error?.message || 'Lỗi kết nối. Vui lòng thử lại sau.';
+      
+      const aiErrorMsg = { 
+        id: (Date.now() + 1).toString(), 
+        role: 'model', 
+        parts: `⚠️ ${errorText}` 
+      };
+      
+      setMessages(prev => [...prev, aiErrorMsg]);
     } finally {
       setIsLoading(false);
       setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);

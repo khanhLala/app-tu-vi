@@ -1,12 +1,12 @@
 package com.tuvi.tuvi_backend.entity;
 
-import com.tuvi.tuvi_backend.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -24,16 +24,33 @@ public class Order {
     @JoinColumn(name = "user_id")
     User user;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    Product product;
+    @Column(name = "total_price", nullable = false)
+    BigDecimal totalPrice;
 
-    int quantity;
-    double totalAmount;
+    @Column(name = "address", nullable = false)
+    String address;
 
-    @Enumerated(EnumType.STRING)
-    OrderStatus status;
+    @Column(name = "phone", nullable = false)
+    String phone;
 
-    @CreationTimestamp
+    @Column(name = "payment_method", nullable = false)
+    String paymentMethod;
+
+    @Column(name = "status", nullable = false)
+    String status;
+
+    @Column(name = "created_at")
     LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @Builder.Default
+    List<OrderItem> items = new java.util.ArrayList<>();
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        if (status == null) {
+            status = "PENDING";
+        }
+    }
 }

@@ -1,7 +1,8 @@
 package com.tuvi.tuvi_backend.controller;
 
 import com.tuvi.tuvi_backend.dto.ApiResponse;
-import com.tuvi.tuvi_backend.entity.Order;
+import com.tuvi.tuvi_backend.dto.request.OrderRequest;
+import com.tuvi.tuvi_backend.dto.response.OrderResponse;
 import com.tuvi.tuvi_backend.service.OrderService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -15,20 +16,33 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderController {
-
     OrderService orderService;
 
     @PostMapping
-    public ApiResponse<Order> createOrder(@RequestParam String productId, @RequestParam int quantity) {
-        return ApiResponse.<Order>builder()
-                .result(orderService.createOrder(productId, quantity))
+    public ApiResponse<OrderResponse> createOrder(@RequestBody OrderRequest request) {
+        return ApiResponse.<OrderResponse>builder()
+                .result(orderService.createOrder(request))
                 .build();
     }
 
-    @GetMapping("/my-orders")
-    public ApiResponse<List<Order>> getMyOrders() {
-        return ApiResponse.<List<Order>>builder()
+    @GetMapping
+    public ApiResponse<List<OrderResponse>> getMyOrders() {
+        return ApiResponse.<List<OrderResponse>>builder()
                 .result(orderService.getMyOrders())
+                .build();
+    }
+
+    @PutMapping("/{id}/cancel")
+    public ApiResponse<OrderResponse> cancelOrder(@PathVariable String id) {
+        return ApiResponse.<OrderResponse>builder()
+                .result(orderService.cancelOrder(id))
+                .build();
+    }
+
+    @PutMapping("/{id}/complete")
+    public ApiResponse<OrderResponse> completeOrder(@PathVariable String id) {
+        return ApiResponse.<OrderResponse>builder()
+                .result(orderService.completeOrder(id))
                 .build();
     }
 }

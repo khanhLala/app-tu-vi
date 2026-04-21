@@ -13,8 +13,10 @@ if sys.platform == "win32":
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import List, Optional
+import traceback
 
 from chat_service import chat, retrieve_relevant_chunks
+from google.genai.errors import ServerError, ClientError
 
 app = FastAPI(
     title="Tử Vi AI Service",
@@ -82,9 +84,16 @@ def chat_endpoint(request: ChatRequest):
 
         return ChatResponse(answer=answer, sources_used=len(chunks))
 
-    except ValueError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    except (ValueError, ServerError) as e:
+        detail_msg = str(e)
+        if "503" in detail_msg or "high demand" in detail_msg.lower():
+            detail_msg = "Hệ thống AI đang quá tải. Vui lòng thử lại sau giây lát."
+        raise HTTPException(status_code=503, detail=detail_msg)
+    except ClientError as e:
+        raise HTTPException(status_code=400, detail=f"Lỗi yêu cầu AI: {str(e)}")
     except Exception as e:
+        print(">>> LỖI AI SERVER:")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Lỗi AI: {str(e)}")
 
 

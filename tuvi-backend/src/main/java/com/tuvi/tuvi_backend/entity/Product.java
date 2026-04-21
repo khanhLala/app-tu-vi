@@ -3,8 +3,8 @@ package com.tuvi.tuvi_backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -19,12 +19,30 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @Column(name = "name", nullable = false)
     String name;
-    String description;
-    double price;
-    String imageUrl;
-    int stock;
 
-    @CreationTimestamp
+    @Column(name = "price", nullable = false)
+    BigDecimal price;
+
+    @Column(name = "description", columnDefinition = "TEXT")
+    String description;
+
+    @Column(name = "image_url")
+    String imageUrl;
+
+    @Column(name = "category")
+    String category;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    ProductType type;
+
+    @Column(name = "created_at")
     LocalDateTime createdAt;
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }

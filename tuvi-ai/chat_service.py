@@ -234,4 +234,8 @@ def chat(
         )
     )
 
+    # 6. Kiểm tra xem có phản hồi không (tránh lỗi Safety Block)
+    if not response.candidates or not response.candidates[0].content.parts:
+        return "Xin lỗi, AI không thể đưa ra luận giải cho trường hợp này. Điều này có thể do câu hỏi vi phạm chính sách nội dung hoặc mô hình đang gặp sự cố tạm thời."
+
     return response.text

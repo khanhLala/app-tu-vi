@@ -5,13 +5,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductResponse {
     String id;
     String name;
-    double price;
+    BigDecimal price;
     String description;
     String imageUrl;
+    String category;
+    String type;
+    LocalDateTime createdAt;
 }
