@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -17,4 +18,6 @@ public class ProductResponse {
     String description;
     String imageUrl;
     String category;
+    String type;
+    LocalDateTime createdAt;
 }

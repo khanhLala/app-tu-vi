@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, String> {
     List<Review> findByProductIdOrderByCreatedAtDesc(String productId);
+    boolean existsByUserIdAndProductId(String userId, String productId);
 }
