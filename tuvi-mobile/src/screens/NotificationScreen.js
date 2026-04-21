@@ -13,11 +13,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Bell, ArrowLeft, Heart, MessageCircle } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axiosClient from '../api/axiosClient';
+import { useNotifications } from '../context/NotificationContext';
 
 const NotificationScreen = ({ navigation }) => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const { refreshUnreadCount } = useNotifications();
 
   useEffect(() => {
     fetchNotifications();
@@ -40,6 +42,7 @@ const NotificationScreen = ({ navigation }) => {
     try {
       await axiosClient.post(`/notifications/${id}/read`);
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+      refreshUnreadCount();
     } catch (err) {
       console.error('Error marking as read:', err);
     }

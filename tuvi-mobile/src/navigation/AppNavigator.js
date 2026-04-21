@@ -25,6 +25,7 @@ import AdminDashboardScreen from '../screens/admin/AdminDashboardScreen';
 import AdminUserManagerScreen from '../screens/admin/AdminUserManagerScreen';
 import AdminReportManagerScreen from '../screens/admin/AdminReportManagerScreen';
 import AdminProductManagerScreen from '../screens/admin/AdminProductManagerScreen';
+import { NotificationProvider, useNotifications } from '../context/NotificationContext';
 
 import * as LucideWeb from 'lucide-react';
 import { Platform } from 'react-native';
@@ -54,6 +55,7 @@ const Tab = createBottomTabNavigator();
 const CustomTabBar = ({ state, descriptors, navigation }) => {
     const insets = useSafeAreaInsets();
     const safeBottom = insets?.bottom || 0;
+    const { unreadCount } = useNotifications();
 
     return (
         <View style={{ 
@@ -95,7 +97,28 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
                         onPress={onPress}
                         style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
                     >
-                        <TabIcon name={iconName} color={isFocused ? '#FBBF24' : '#64748B'} size={24} />
+                        <View>
+                            <TabIcon name={iconName} color={isFocused ? '#FBBF24' : '#64748B'} size={24} />
+                            {(route.name === 'NotiTab' || route.name === 'AdminReportsTab') && unreadCount > 0 && (
+                                <View style={{
+                                    position: 'absolute',
+                                    right: -6,
+                                    top: -3,
+                                    backgroundColor: '#EF4444',
+                                    borderRadius: 10,
+                                    minWidth: 16,
+                                    height: 16,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    borderWidth: 1.5,
+                                    borderColor: '#0F172A'
+                                }}>
+                                    <Text style={{ color: 'white', fontSize: 9, fontWeight: 'bold' }}>
+                                        {unreadCount > 99 ? '99+' : unreadCount}
+                                    </Text>
+                                </View>
+                            )}
+                        </View>
                         <Text style={{ color: isFocused ? '#FBBF24' : '#64748B', fontSize: 10, marginTop: 2 }}>
                             {label}
                         </Text>
@@ -193,18 +216,20 @@ const AppNavigator = () => {
     }
 
     return (
-        <NavigationContainer theme={{ dark: true, colors: { primary: '#FBBF24', background: '#0F172A', card: '#0F172A', text: '#F8FAFC', border: '#334155', notification: '#EF4444' } }}>
-            {!auth.token ? (
-                <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: '#0F172A' } }}>
-                    <Stack.Screen name="Login" component={LoginScreen} />
-                    <Stack.Screen name="Register" component={RegisterScreen} />
-                </Stack.Navigator>
-            ) : auth.isAdmin ? (
-                <AdminStack />
-            ) : (
-                <UserStack />
-            )}
-        </NavigationContainer>
+        <NotificationProvider>
+            <NavigationContainer theme={{ dark: true, colors: { primary: '#FBBF24', background: '#0F172A', card: '#0F172A', text: '#F8FAFC', border: '#334155', notification: '#EF4444' } }}>
+                {!auth.token ? (
+                    <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: '#0F172A' } }}>
+                        <Stack.Screen name="Login" component={LoginScreen} />
+                        <Stack.Screen name="Register" component={RegisterScreen} />
+                    </Stack.Navigator>
+                ) : auth.isAdmin ? (
+                    <AdminStack />
+                ) : (
+                    <UserStack />
+                )}
+            </NavigationContainer>
+        </NotificationProvider>
     );
 };
 
