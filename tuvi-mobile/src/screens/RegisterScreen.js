@@ -49,15 +49,30 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     setLoading(true);
+    const submitData = {
+      ...formData,
+      username: formData.username.trim(),
+      password: formData.password.trim(),
+    };
+
     try {
-      await axiosClient.post('/users', formData);
+      await axiosClient.post('/users', submitData);
       Alert.alert(
         'Thành công', 
         'Đăng ký tài khoản thành công! Vui lòng đăng nhập.',
         [{ text: 'OK', onPress: () => navigation.navigate('Login') }]
       );
     } catch (error) {
-      const message = error.message || 'Có lỗi xảy ra trong quá trình đăng ký.';
+      console.error('Registration error:', error);
+      let message = 'Có lỗi xảy ra trong quá trình đăng ký.';
+      
+      if (error.response && error.response.data) {
+        // Lấy message từ cấu trúc ApiResponse của Spring Boot
+        message = error.response.data.message || message;
+      } else if (error.message) {
+        message = error.message;
+      }
+      
       Alert.alert('Lỗi đăng ký', message);
     } finally {
       setLoading(false);

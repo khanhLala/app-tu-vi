@@ -11,7 +11,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +41,12 @@ public class AdminService {
                 .sum();
         stats.put("totalRevenue", totalRevenue);
         
-        // Simplified "today" counts: just returning total for now as a mock if complexity is high
-        stats.put("newUsersToday", userRepository.count()); // Replace with today's count logic if needed
-        stats.put("newPostsToday", postRepository.count());
+        // Real "today" counts: from midnight today
+        LocalDateTime startOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT);
+        
+        stats.put("newUsersToday", userRepository.countByCreatedAtAfter(startOfDay));
+        stats.put("newPostsToday", postRepository.countByCreatedAtAfter(startOfDay));
+        stats.put("newChartsToday", tuViProfileRepository.countByCreatedAtAfter(startOfDay));
         
         return stats;
     }

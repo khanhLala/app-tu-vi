@@ -8,10 +8,15 @@ from sqlalchemy.orm import Session
 from lib.database import get_db
 from lib.models import User
 
-# Configuration
-SECRET_KEY = "SUPER_SECRET_KEY_FOR_TUVI_PYTHON"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Configuration - Synchronized with Java Backend
+SECRET_KEY = os.getenv("JWT_SIGNER_KEY", "zP6kSv9m2L5nR8tW1zX4c7vB0nM3qWpR5tY7uI9oP0aS1dF3gH5jK7lL9zX1V2B5N8M0")
+ALGORITHM = "HS512"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 # Extended for convenience
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")

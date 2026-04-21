@@ -165,10 +165,18 @@ class TuViChart:
             }
         return chart_data
 
+import uuid
+from sqlalchemy import Column, Integer, String, Boolean
+
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    password_hash = Column(String)
-    role = Column(String, default="user") # 'user' or 'admin'
+    id = Column(String(255), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    username = Column(String(255), unique=True, index=True)
+    password_hash = Column("password", String(255))
+    first_name = Column(String(255))
+    last_name = Column(String(255))
+    email = Column(String(255), unique=True)
+    phone = Column(String(255))
+    is_active = Column(Boolean, default=True)
+

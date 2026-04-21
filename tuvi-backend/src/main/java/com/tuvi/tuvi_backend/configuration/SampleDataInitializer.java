@@ -54,7 +54,7 @@ public class SampleDataInitializer {
                         .lastName("Tên_" + i)
                         .email("user" + i + "@example.com")
                         .phone("09" + String.format("%08d", i))
-                        .roles(Set.of(userRole))
+                        .roles(userRole != null ? Set.of(userRole) : Set.of())
                         .dob(LocalDate.now().minusYears(20 + random.nextInt(30)))
                         .build();
                 sampleUsers.add(user);

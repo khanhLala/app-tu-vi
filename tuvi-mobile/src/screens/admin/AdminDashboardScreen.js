@@ -129,6 +129,8 @@ const AdminDashboardScreen = ({ navigation }) => {
                 value={stats?.totalCharts} 
                 icon={Compass} 
                 color="#F59E0B" 
+                subValue={stats?.newChartsToday}
+                subLabel="hôm nay"
               />
               <StatCard 
                 title="Tổng Doanh Thu" 
