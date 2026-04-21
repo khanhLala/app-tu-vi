@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "avatarUrl", ignore = true)
     User toUser(UserCreationRequest request);
 
     UserResponse toUserResponse(User user);

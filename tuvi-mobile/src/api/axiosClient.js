@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const axiosClient = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.0.113:8080/api/v1', // Lấy từ .env hoặc mặc định
+  baseURL: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.59:8088/api/v1/', // Đã cập nhật sang cổng 8088 và thêm dấu / cuối
   headers: {
     'Content-Type': 'application/json',
   },
@@ -25,7 +25,7 @@ axiosClient.interceptors.request.use(async (config) => {
   // Không gắn token cho các endpoint công khai (Login, Register)
   const publicEndpoints = ['/auth/token', '/users'];
   const isPublicEndpoint = publicEndpoints.some(endpoint => config.url.endsWith(endpoint));
-  
+
   if (isPublicEndpoint && config.method === 'post') {
     return config;
   }
@@ -52,9 +52,9 @@ axiosClient.interceptors.response.use((response) => {
   // Nếu là lỗi 401 và không phải là yêu cầu refresh chính nó
   if (response && response.status === 401 && !originalRequest._retry) {
     if (originalRequest.url.endsWith('/auth/refresh')) {
-        // Nếu chính request refresh cũng lỗi 401 thì logout luôn
-        await AsyncStorage.removeItem('token');
-        return Promise.reject(error);
+      // Nếu chính request refresh cũng lỗi 401 thì logout luôn
+      await AsyncStorage.removeItem('token');
+      return Promise.reject(error);
     }
 
     if (isRefreshing) {
@@ -81,10 +81,10 @@ axiosClient.interceptors.response.use((response) => {
       if (code === 1000 && result.token) {
         const newToken = result.token;
         await AsyncStorage.setItem('token', newToken);
-        
+
         isRefreshing = false;
         onRefreshed(newToken);
-        
+
         // Thực hiện lại request ban đầu với token mới
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return axiosClient(originalRequest);

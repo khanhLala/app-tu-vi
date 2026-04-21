@@ -20,6 +20,8 @@ import ProfileScreen from '../screens/ProfileScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import SecurityScreen from '../screens/SecurityScreen';
 import SupportScreen from '../screens/SupportScreen';
+import ProductDetailScreen from '../screens/ProductDetailScreen';
+import CartScreen from '../screens/CartScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -160,6 +162,8 @@ const AppNavigator = () => {
         <Stack.Screen name="EditProfile" component={EditProfileScreen} />
         <Stack.Screen name="Security" component={SecurityScreen} />
         <Stack.Screen name="Support" component={SupportScreen} />
+        <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
+        <Stack.Screen name="Cart" component={CartScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
