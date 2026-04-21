@@ -34,6 +34,10 @@ public class Product {
     @Column(name = "category")
     String category;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    ProductType type;
+
     @Column(name = "created_at")
     LocalDateTime createdAt;
     

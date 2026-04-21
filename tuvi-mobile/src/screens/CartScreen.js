@@ -93,7 +93,7 @@ const CartScreen = ({ navigation }) => {
               </View>
               <TouchableOpacity
                 style={styles.checkoutBtn}
-                onPress={() => Alert.alert('Thông báo', 'Chức năng thanh toán đang được phát triển!')}
+                onPress={() => navigation.navigate('Checkout')}
                 activeOpacity={0.8}
               >
                 <LinearGradient colors={['#FBBF24', '#F59E0B']} style={styles.checkoutGradient}>

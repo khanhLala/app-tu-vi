@@ -194,7 +194,6 @@ const styles = StyleSheet.create({
   imagePlaceholder: { backgroundColor: '#1E293B', alignItems: 'center', justifyContent: 'center' },
   info: { flex: 1, paddingHorizontal: 12, paddingVertical: 10 },
   category: { color: '#64748B', fontSize: 10, marginBottom: 4, textTransform: 'uppercase' },
-  itemName: { color: '#F8FAFC', fontSize: 15, fontWeight: 'bold' },
   stars: { flexDirection: 'row', marginTop: 6, gap: 2 },
   priceTag: {
     backgroundColor: '#FBBF24', paddingHorizontal: 10, paddingVertical: 16,
