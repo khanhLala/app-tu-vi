@@ -10,7 +10,8 @@ import {
   Clipboard,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Share2, Clipboard as CopyIcon, X, MessageCircle } from 'lucide-react-native';
 import PalaceBox from '../components/PalaceBox';
@@ -21,6 +22,8 @@ const CELL_SIZE = width / 4;
 const ChartDetailScreen = ({ navigation, route }) => {
   const { chartData, hidePrivateInfo = false } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
+  const insets = useSafeAreaInsets();
+
 
   // Thứ tự các cung trong lưới 4x4 (0-11 tương ứng Hợi-Tý-Sửu... trong data)
   // Vị trí:
@@ -186,7 +189,9 @@ const ChartDetailScreen = ({ navigation, route }) => {
               <Text style={styles.legendItem}>• Màu xanh: Cát tinh</Text>
               <Text style={styles.legendItem}>• Màu xám: Hung tinh</Text>
           </View>
+          <View style={{ height: insets.bottom + 20 }} />
         </ScrollView>
+
 
         {/* Modal hiển thị Prompt */}
         <Modal

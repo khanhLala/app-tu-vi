@@ -4,7 +4,8 @@ import {
   FlatList, KeyboardAvoidingView, Platform,
   ActivityIndicator, Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Send, Sparkles, Bot, User, RotateCcw } from 'lucide-react-native';
 import axiosClient from '../api/axiosClient';
@@ -58,6 +59,8 @@ const TypingIndicator = () => (
 // ── Main Screen ─────────────────────────────────────────────────────────────
 const ChatScreen = ({ navigation, route }) => {
   const chartData = route.params?.chartData || null;
+  const insets = useSafeAreaInsets();
+
 
   const [messages, setMessages] = useState([
     {
@@ -210,7 +213,8 @@ const ChatScreen = ({ navigation, route }) => {
           )}
 
           {/* ── Input box ── */}
-          <View style={styles.inputBar}>
+          <View style={[styles.inputBar, { paddingBottom: insets.bottom > 0 ? insets.bottom : 16 }]}>
+
             <TextInput
               style={styles.input}
               value={inputText}

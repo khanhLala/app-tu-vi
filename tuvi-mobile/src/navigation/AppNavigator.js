@@ -21,7 +21,7 @@ import EditProfileScreen from '../screens/EditProfileScreen';
 import SecurityScreen from '../screens/SecurityScreen';
 import SupportScreen from '../screens/SupportScreen';
 import ChatScreen from '../screens/ChatScreen';
-import AdminHomeScreen from '../screens/AdminHomeScreen';
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -163,7 +163,6 @@ const AppNavigator = () => {
         <Stack.Screen name="Security" component={SecurityScreen} />
         <Stack.Screen name="Support" component={SupportScreen} />
         <Stack.Screen name="Chat" component={ChatScreen} />
-        <Stack.Screen name="AdminMain" component={AdminHomeScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
