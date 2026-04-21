@@ -10,9 +10,10 @@ import {
   Clipboard,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, Share2, Clipboard as CopyIcon, X } from 'lucide-react-native';
+import { ArrowLeft, Share2, Clipboard as CopyIcon, X, MessageCircle } from 'lucide-react-native';
 import PalaceBox from '../components/PalaceBox';
 
 const { width } = Dimensions.get('window');
@@ -21,6 +22,8 @@ const CELL_SIZE = width / 4;
 const ChartDetailScreen = ({ navigation, route }) => {
   const { chartData, hidePrivateInfo = false } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
+  const insets = useSafeAreaInsets();
+
 
   // Thứ tự các cung trong lưới 4x4 (0-11 tương ứng Hợi-Tý-Sửu... trong data)
   // Vị trí:
@@ -170,13 +173,25 @@ const ChartDetailScreen = ({ navigation, route }) => {
             </TouchableOpacity>
           )}
 
+          {!hidePrivateInfo && (
+            <TouchableOpacity
+              style={styles.aiBtn}
+              onPress={() => navigation.navigate('Chat', { chartData })}
+            >
+              <MessageCircle color="#FBBF24" size={20} />
+              <Text style={styles.aiBtnText}>HỎI THẦY TỬ VI AI</Text>
+            </TouchableOpacity>
+          )}
+
           <View style={styles.legend}>
               <Text style={styles.legendTitle}>Ghi chú:</Text>
               <Text style={styles.legendItem}>• Màu đỏ: Chính tinh</Text>
               <Text style={styles.legendItem}>• Màu xanh: Cát tinh</Text>
               <Text style={styles.legendItem}>• Màu xám: Hung tinh</Text>
           </View>
+          <View style={{ height: insets.bottom + 20 }} />
         </ScrollView>
+
 
         {/* Modal hiển thị Prompt */}
         <Modal
@@ -274,6 +289,19 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   promptBtnText: { color: '#0F172A', fontSize: 14, fontWeight: 'bold', marginLeft: 10 },
+  aiBtn: {
+    borderColor: '#FBBF24',
+    borderWidth: 1.5,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    height: 56,
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(251,191,36,0.08)',
+  },
+  aiBtnText: { color: '#FBBF24', fontSize: 14, fontWeight: 'bold', marginLeft: 10 },
   legend: { padding: 20 },
   legendTitle: { color: '#FBBF24', fontSize: 14, fontWeight: 'bold', marginBottom: 8 },
   legendItem: { color: '#94A3B8', fontSize: 12, marginBottom: 4 },
