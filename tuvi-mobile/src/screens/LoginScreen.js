@@ -16,8 +16,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Eye, EyeOff, User, Lock } from 'lucide-react-native';
 import axiosClient from '../api/axiosClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../context/AuthContext';
 
 const LoginScreen = ({ navigation }) => {
+  const auth = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -45,15 +47,13 @@ const LoginScreen = ({ navigation }) => {
 
       if (result && result.token) {
         await AsyncStorage.setItem('token', result.token);
-        console.log('>>> [LOGIN] Token saved successfully');
         
-        if (Platform.OS === 'web') {
-          console.log('>>> [LOGIN] WEB DETECTED - FORCING RELOAD...');
-          window.location.reload();
-        }
-      } else {
-        console.warn('>>> [LOGIN] No token in result');
-        Alert.alert('Lỗi', 'Không nhận được mã xác thực từ máy chủ.');
+        // Cần fetch profile để lấy quyền (Admin/User) trước khi truyền vào context
+        const profile = await axiosClient.get('/users/my-info');
+        console.log('>>> [LOGIN] Profile fetched:', profile);
+        
+        console.log('>>> [LOGIN] Invoking auth.login context update');
+        auth.login(result.token, profile);
       }
     } catch (error) {
       console.error('>>> [LOGIN] Error Details:', error);

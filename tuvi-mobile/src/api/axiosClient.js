@@ -27,7 +27,7 @@ axiosClient.interceptors.request.use(async (config) => {
   // Không gắn token cho các endpoint công khai (Login, Register)
   const publicEndpoints = ['/auth/token', '/users'];
   const isPublicEndpoint = publicEndpoints.some(endpoint => config.url.endsWith(endpoint));
-  
+
   if (isPublicEndpoint && config.method === 'post') {
     return config;
   }
@@ -53,10 +53,10 @@ axiosClient.interceptors.response.use((response) => {
 
   // Nếu là lỗi 401 và không phải là yêu cầu refresh chính nó
   if (response && response.status === 401 && !originalRequest._retry) {
-    if (originalRequest.url.endsWith('/auth/refresh')) {
-        // Nếu chính request refresh cũng lỗi 401 thì logout luôn
-        await AsyncStorage.removeItem('token');
-        return Promise.reject(error);
+    if (originalRequest.url.endsWith('/auth/refresh') || originalRequest.url.endsWith('/auth/logout')) {
+      // Nếu chính request refresh hoặc logout lỗi 401 thì xóa token và reject luôn
+      await AsyncStorage.removeItem('token');
+      return Promise.reject(error);
     }
 
     if (isRefreshing) {
@@ -83,10 +83,10 @@ axiosClient.interceptors.response.use((response) => {
       if (code === 1000 && result.token) {
         const newToken = result.token;
         await AsyncStorage.setItem('token', newToken);
-        
+
         isRefreshing = false;
         onRefreshed(newToken);
-        
+
         // Thực hiện lại request ban đầu với token mới
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return axiosClient(originalRequest);

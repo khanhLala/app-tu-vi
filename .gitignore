@@ -34,6 +34,10 @@ env/
 ENV/
 tuvi-python/venv/
 tuvi-python/__pycache__/
+tuvi-ai/__pycache__/
+tuvi-ai/venv/
+# File tạm sinh ra khi khảo sát PDF (không cần push)
+tuvi-ai/scripts/raw_extract.json
 
 # Environment and Secrets
 .env
@@ -42,6 +46,8 @@ tuvi-python/__pycache__/
 *.env
 tuvi-backend/.env
 tuvi-mobile/.env
+tuvi-python/.env
+tuvi-ai/.env
 
 # Logs
 *.log

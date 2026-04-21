@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.core.annotation.Order;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 

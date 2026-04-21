@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axiosClient from '../api/axiosClient';
+import { View, ActivityIndicator, Text, TouchableOpacity, Platform } from 'react-native';
 
+// Screens
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import CreateChartScreen from '../screens/CreateChartScreen';
@@ -21,23 +20,32 @@ import EditProfileScreen from '../screens/EditProfileScreen';
 import SecurityScreen from '../screens/SecurityScreen';
 import SupportScreen from '../screens/SupportScreen';
 import NotificationScreen from '../screens/NotificationScreen';
+import ProductDetailScreen from '../screens/ProductDetailScreen';
+import CartScreen from '../screens/CartScreen';
+import ChatScreen from '../screens/ChatScreen';
+
+// Admin Screens
 import AdminDashboardScreen from '../screens/admin/AdminDashboardScreen';
 import AdminUserManagerScreen from '../screens/admin/AdminUserManagerScreen';
 import AdminReportManagerScreen from '../screens/admin/AdminReportManagerScreen';
 import AdminProductManagerScreen from '../screens/admin/AdminProductManagerScreen';
+
+// Context & Icons
 import { NotificationProvider, useNotifications } from '../context/NotificationContext';
-
+import { AuthProvider, useAuth } from '../context/AuthContext';
 import * as LucideWeb from 'lucide-react';
-import { Platform } from 'react-native';
 
-// Helper to handle Lucide icons on both Web and Native
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+// --- COMPONENTS ---
+
 const TabIcon = ({ name, color, size }) => {
     if (Platform.OS === 'web') {
         const IconComponent = LucideWeb[name];
         return IconComponent ? <IconComponent color={color} size={size} /> : null;
     }
     
-    // For Native, we use requirement to avoid potential web crashes from native modules
     try {
         const LucideNative = require('lucide-react-native');
         const IconComponent = LucideNative[name];
@@ -46,11 +54,6 @@ const TabIcon = ({ name, color, size }) => {
         return null;
     }
 };
-
-const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
-
-// --- COMPONENTS ---
 
 const CustomTabBar = ({ state, descriptors, navigation }) => {
     const insets = useSafeAreaInsets();
@@ -159,7 +162,7 @@ const AdminTabs = () => {
     );
 };
 
-// --- MAIN NAVIGATOR ---
+// --- STACKS ---
 
 const AdminStack = () => (
     <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: '#0F172A' } }}>
@@ -169,6 +172,10 @@ const AdminStack = () => (
         <Stack.Screen name="AdminProducts" component={AdminProductManagerScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+        <Stack.Screen name="History" component={ProfileListScreen} />
+        <Stack.Screen name="ChartDetail" component={ChartDetailScreen} />
+        <Stack.Screen name="Security" component={SecurityScreen} />
+        <Stack.Screen name="Support" component={SupportScreen} />
     </Stack.Navigator>
 );
 
@@ -182,32 +189,18 @@ const UserStack = () => (
         <Stack.Screen name="EditProfile" component={EditProfileScreen} />
         <Stack.Screen name="Security" component={SecurityScreen} />
         <Stack.Screen name="Support" component={SupportScreen} />
+        <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
+        <Stack.Screen name="Cart" component={CartScreen} />
+        <Stack.Screen name="Chat" component={ChatScreen} />
     </Stack.Navigator>
 );
 
-const AppNavigator = () => {
-    const [auth, setAuth] = useState({ isLoading: true, token: null, isAdmin: false });
+// --- MAIN NAVIGATOR ---
 
-    const checkAuthStatus = async () => {
-        try {
-            const token = await AsyncStorage.getItem('token');
-            if (!token) {
-                setAuth({ isLoading: false, token: null, isAdmin: false });
-                return;
-            }
-            const profile = await axiosClient.get('/users/my-info');
-            const isAdmin = profile.roles && profile.roles.some(r => r === 'ADMIN' || r.name === 'ADMIN');
-            setAuth({ isLoading: false, token, isAdmin });
-        } catch (error) {
-            setAuth({ isLoading: false, token: null, isAdmin: false });
-        }
-    };
+const NavigationContent = () => {
+    const { token, isAdmin, isLoading } = useAuth();
 
-    useEffect(() => {
-        checkAuthStatus();
-    }, []);
-
-    if (auth.isLoading) {
+    if (isLoading) {
         return (
             <View style={{ flex: 1, backgroundColor: '#0F172A', justifyContent: 'center', alignItems: 'center' }}>
                 <ActivityIndicator size="large" color="#FBBF24" />
@@ -216,20 +209,38 @@ const AppNavigator = () => {
     }
 
     return (
-        <NotificationProvider>
-            <NavigationContainer theme={{ dark: true, colors: { primary: '#FBBF24', background: '#0F172A', card: '#0F172A', text: '#F8FAFC', border: '#334155', notification: '#EF4444' } }}>
-                {!auth.token ? (
-                    <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: '#0F172A' } }}>
-                        <Stack.Screen name="Login" component={LoginScreen} />
-                        <Stack.Screen name="Register" component={RegisterScreen} />
-                    </Stack.Navigator>
-                ) : auth.isAdmin ? (
-                    <AdminStack />
-                ) : (
-                    <UserStack />
-                )}
-            </NavigationContainer>
-        </NotificationProvider>
+        <NavigationContainer theme={{ 
+            dark: true, 
+            colors: { 
+                primary: '#FBBF24', 
+                background: '#0F172A', 
+                card: '#0F172A', 
+                text: '#F8FAFC', 
+                border: '#334155', 
+                notification: '#EF4444' 
+            } 
+        }}>
+            {!token ? (
+                <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: '#0F172A' } }}>
+                    <Stack.Screen name="Login" component={LoginScreen} />
+                    <Stack.Screen name="Register" component={RegisterScreen} />
+                </Stack.Navigator>
+            ) : isAdmin ? (
+                <AdminStack />
+            ) : (
+                <UserStack />
+            )}
+        </NavigationContainer>
+    );
+};
+
+const AppNavigator = () => {
+    return (
+        <AuthProvider>
+            <NotificationProvider>
+                <NavigationContent />
+            </NotificationProvider>
+        </AuthProvider>
     );
 };
 

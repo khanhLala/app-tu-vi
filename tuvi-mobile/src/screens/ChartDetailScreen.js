@@ -10,9 +10,10 @@ import {
   Clipboard,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, Share2, Clipboard as CopyIcon, X } from 'lucide-react-native';
+import { ArrowLeft, Share2, Clipboard as CopyIcon, X, MessageCircle } from 'lucide-react-native';
 import PalaceBox from '../components/PalaceBox';
 
 const { width } = Dimensions.get('window');
@@ -21,6 +22,8 @@ const CELL_SIZE = width / 4;
 const ChartDetailScreen = ({ navigation, route }) => {
   const { chartData, hidePrivateInfo = false } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
+  const insets = useSafeAreaInsets();
+
 
   // Thứ tự các cung trong lưới 4x4 (0-11 tương ứng Hợi-Tý-Sửu... trong data)
   // Vị trí:
@@ -156,19 +159,29 @@ const ChartDetailScreen = ({ navigation, route }) => {
               <Text style={styles.infoText}>Âm lịch: {maskInfo(chartData.personal_info.lunar_date)}</Text>
           </View>
 
+          {!hidePrivateInfo && (
+            <View style={styles.aiHeaderActions}>
+              <TouchableOpacity 
+                style={[styles.aiHeaderBtn, { backgroundColor: '#FBBF24' }]}
+                onPress={() => setModalVisible(true)}
+              >
+                <CopyIcon color="#0F172A" size={16} />
+                <Text style={[styles.aiHeaderBtnText, { color: '#0F172A' }]}>PROMPT</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.aiHeaderBtn, { borderColor: '#FBBF24', borderWidth: 1 }]}
+                onPress={() => navigation.navigate('Chat', { chartData })}
+              >
+                <MessageCircle color="#FBBF24" size={16} />
+                <Text style={[styles.aiHeaderBtnText, { color: '#FBBF24' }]}>HỎI AI</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           <View style={styles.zoomContainer}>
             {renderGrid()}
           </View>
-          
-          {!hidePrivateInfo && (
-            <TouchableOpacity 
-              style={styles.promptBtn}
-              onPress={() => setModalVisible(true)}
-            >
-              <CopyIcon color="#0F172A" size={20} />
-              <Text style={styles.promptBtnText}>COPY PROMPT LÁ SỐ</Text>
-            </TouchableOpacity>
-          )}
 
           <View style={styles.legend}>
               <Text style={styles.legendTitle}>Ghi chú:</Text>
@@ -176,7 +189,9 @@ const ChartDetailScreen = ({ navigation, route }) => {
               <Text style={styles.legendItem}>• Màu xanh: Cát tinh</Text>
               <Text style={styles.legendItem}>• Màu xám: Hung tinh</Text>
           </View>
+          <View style={{ height: insets.bottom + 20 }} />
         </ScrollView>
+
 
         {/* Modal hiển thị Prompt */}
         <Modal
@@ -188,7 +203,7 @@ const ChartDetailScreen = ({ navigation, route }) => {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>AI Analysis Prompt</Text>
+                <Text style={styles.modalTitle}>Thông tin lá số kèm prompt</Text>
                 <TouchableOpacity onPress={() => setModalVisible(false)}>
                   <X color="#94A3B8" size={24} />
                 </TouchableOpacity>
@@ -198,7 +213,7 @@ const ChartDetailScreen = ({ navigation, route }) => {
               </ScrollView>
               <TouchableOpacity style={styles.copyBtn} onPress={() => {
                 Clipboard.setString(chartData.ai_prompt);
-                Alert.alert('Thành công', 'Đã sao chép Prompt cho AI vào bộ nhớ tạm.');
+                Alert.alert('Thành công', 'Đã sao chép Prompt vào bộ nhớ tạm.');
               }}>
                 <Text style={styles.copyBtnText}>SAO CHÉP TOÀN BỘ</Text>
               </TouchableOpacity>
@@ -259,6 +274,27 @@ const styles = StyleSheet.create({
     lineHeight: 12,
     textAlign: 'left',
   },
+  aiHeaderActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginBottom: 8,
+    gap: 12,
+  },
+  aiHeaderBtn: {
+    flex: 1,
+    height: 40,
+    borderRadius: 8,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 2,
+  },
+  aiHeaderBtnText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 6,
+  },
   promptBtn: {
     backgroundColor: '#FBBF24',
     margin: 16,
@@ -274,6 +310,19 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   promptBtnText: { color: '#0F172A', fontSize: 14, fontWeight: 'bold', marginLeft: 10 },
+  aiBtn: {
+    borderColor: '#FBBF24',
+    borderWidth: 1.5,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    height: 56,
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(251,191,36,0.08)',
+  },
+  aiBtnText: { color: '#FBBF24', fontSize: 14, fontWeight: 'bold', marginLeft: 10 },
   legend: { padding: 20 },
   legendTitle: { color: '#FBBF24', fontSize: 14, fontWeight: 'bold', marginBottom: 8 },
   legendItem: { color: '#94A3B8', fontSize: 12, marginBottom: 4 },

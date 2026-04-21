@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Switch, ActivityIndicator, Image, Alert } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Switch, ActivityIndicator, Image, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { User, Bell, Shield, CircleHelp, LogOut, ChevronRight, Camera } from 'lucide-react-native';
 import axiosClient from '../api/axiosClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
+import { useAuth } from '../context/AuthContext';
 
 const SettingsScreen = ({ navigation }) => {
+  const auth = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -31,8 +33,30 @@ const SettingsScreen = ({ navigation }) => {
   }, [navigation]);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('token');
-    if (window.location) window.location.reload();
+    console.log('>>> handleLogout triggered, OS:', Platform.OS);
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm('Bạn có chắc chắn muốn đăng xuất không?');
+      console.log('>>> Logout confirmation result:', confirmed);
+      if (confirmed) {
+        await auth.logout();
+      }
+      return;
+    }
+
+    Alert.alert(
+      'Đăng xuất',
+      'Bạn có chắc chắn muốn đăng xuất không?',
+      [
+        { text: 'Hủy', style: 'cancel' },
+        { 
+          text: 'Đăng xuất', 
+          style: 'destructive',
+          onPress: async () => {
+            await auth.logout();
+          }
+        },
+      ]
+    );
   };
 
   const pickImage = async () => {
@@ -102,8 +126,8 @@ const SettingsScreen = ({ navigation }) => {
         </View>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.profileSection}>
-            <TouchableOpacity 
-              style={styles.avatarContainer} 
+            <TouchableOpacity
+              style={styles.avatarContainer}
               onPress={pickImage}
               disabled={uploading}
             >
@@ -127,18 +151,24 @@ const SettingsScreen = ({ navigation }) => {
               <Text style={styles.profileName} allowFontScaling={false}>{profile ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || profile.username : '...'}</Text>
               <Text style={styles.profileEmail}>{profile ? `ID: ${profile.id.substring(0, 8)}` : 'Đang tải...'}</Text>
             </View>
+            <TouchableOpacity 
+              style={styles.editBtn} 
+              onPress={() => navigation.navigate('EditProfile', { profile })}
+            >
+              <Text style={styles.editBtnText} allowFontScaling={false}>Sửa</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>TÀI KHOẢN</Text>
-            <SettingItem 
-              icon={<User color="#94A3B8" size={20} />} 
-              label="Thông tin cá nhân" 
+            <SettingItem
+              icon={<User color="#94A3B8" size={20} />}
+              label="Thông tin cá nhân"
               onPress={() => navigation.navigate('Profile')}
             />
-            <SettingItem 
-              icon={<Shield color="#94A3B8" size={20} />} 
-              label="Bảo mật & Mật khẩu" 
+            <SettingItem
+              icon={<Shield color="#94A3B8" size={20} />}
+              label="Bảo mật & Mật khẩu"
               onPress={() => navigation.navigate('Security')}
             />
           </View>
@@ -146,9 +176,9 @@ const SettingsScreen = ({ navigation }) => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>ỨNG DỤNG</Text>
             <SettingItem icon={<Bell color="#94A3B8" size={20} />} label="Thông báo" type="switch" />
-            <SettingItem 
-              icon={<CircleHelp color="#94A3B8" size={20} />} 
-              label="Hỗ trợ & Góp ý" 
+            <SettingItem
+              icon={<CircleHelp color="#94A3B8" size={20} />}
+              label="Hỗ trợ & Góp ý"
               onPress={() => navigation.navigate('Support')}
             />
           </View>

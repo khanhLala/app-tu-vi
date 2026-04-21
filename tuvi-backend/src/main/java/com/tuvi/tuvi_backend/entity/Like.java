@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name = "likes", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"post_id", "user_id"})
+        @UniqueConstraint(columnNames = { "post_id", "user_id" })
 })
 public class Like {
     @Id
