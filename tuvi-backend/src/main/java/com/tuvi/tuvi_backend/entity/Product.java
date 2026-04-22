@@ -7,6 +7,8 @@ import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -38,7 +40,7 @@ public class Product {
     @Column(name = "type")
     ProductType type;
 
-    @org.hibernate.annotations.CreationTimestamp
+    @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     LocalDateTime createdAt;
 }

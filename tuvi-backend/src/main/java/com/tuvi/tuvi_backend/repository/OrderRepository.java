@@ -1,16 +1,15 @@
 package com.tuvi.tuvi_backend.repository;
 
-import com.tuvi.tuvi_backend.entity.Order;
-import com.tuvi.tuvi_backend.entity.Product;
-import com.tuvi.tuvi_backend.entity.User;
-import com.tuvi.tuvi_backend.enums.OrderStatus;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.tuvi.tuvi_backend.entity.Order;
+import com.tuvi.tuvi_backend.entity.User;
+import com.tuvi.tuvi_backend.enums.OrderStatus;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, String> {

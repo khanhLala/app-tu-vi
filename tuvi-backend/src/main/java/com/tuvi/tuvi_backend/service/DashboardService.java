@@ -1,29 +1,26 @@
 package com.tuvi.tuvi_backend.service;
 
-import com.tuvi.tuvi_backend.dto.response.DashboardResponse;
-import com.tuvi.tuvi_backend.dto.response.OrderResponse;
-import com.tuvi.tuvi_backend.dto.response.ProductRevenueResponse;
-import com.tuvi.tuvi_backend.entity.Order;
-import com.tuvi.tuvi_backend.entity.OrderItem;
-import com.tuvi.tuvi_backend.enums.OrderStatus;
-import com.tuvi.tuvi_backend.enums.ReportStatus;
-
-import com.tuvi.tuvi_backend.repository.OrderRepository;
-import com.tuvi.tuvi_backend.repository.PostRepository;
-import com.tuvi.tuvi_backend.repository.ReportRepository;
-import com.tuvi.tuvi_backend.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.tuvi.tuvi_backend.dto.response.DashboardResponse;
+import com.tuvi.tuvi_backend.dto.response.OrderResponse;
+import com.tuvi.tuvi_backend.dto.response.ProductRevenueResponse;
+import com.tuvi.tuvi_backend.entity.Order;
+import com.tuvi.tuvi_backend.enums.OrderStatus;
+import com.tuvi.tuvi_backend.enums.ReportStatus;
+import com.tuvi.tuvi_backend.repository.OrderRepository;
+import com.tuvi.tuvi_backend.repository.PostRepository;
+import com.tuvi.tuvi_backend.repository.ReportRepository;
+import com.tuvi.tuvi_backend.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -62,27 +59,26 @@ public class DashboardService {
                                 .collect(Collectors.toList());
         }
 
-    public List<OrderResponse> getAllOrders(OrderStatus status, String search) {
-        List<Order> orders;
-        if (status != null) {
-            orders = orderRepository.findByStatusOrderByCreatedAtDesc(status);
-        } else {
-            orders = orderRepository.findAllByOrderByCreatedAtDesc();
+        public List<OrderResponse> getAllOrders(OrderStatus status, String search) {
+                List<Order> orders;
+                if (status != null) {
+                        orders = orderRepository.findByStatusOrderByCreatedAtDesc(status);
+                } else {
+                        orders = orderRepository.findAllByOrderByCreatedAtDesc();
+                }
+
+                if (search != null && !search.isEmpty()) {
+                        String finalSearch = search.toLowerCase();
+                        return orders.stream()
+                                        .filter(o -> o.getId().toLowerCase().contains(finalSearch))
+                                        .map(this::mapToOrderResponse)
+                                        .collect(Collectors.toList());
+                }
+
+                return orders.stream()
+                                .map(this::mapToOrderResponse)
+                                .collect(Collectors.toList());
         }
-
-        if (search != null && !search.isEmpty()) {
-            String finalSearch = search.toLowerCase();
-            return orders.stream()
-                    .filter(o -> o.getId().toLowerCase().contains(finalSearch))
-                    .map(this::mapToOrderResponse)
-                    .collect(Collectors.toList());
-        }
-
-        return orders.stream()
-                .map(this::mapToOrderResponse)
-                .collect(Collectors.toList());
-    }
-
 
         public List<OrderResponse> getOrdersByProduct(String productId) {
                 return orderRepository.findOrdersByProductId(productId).stream()
