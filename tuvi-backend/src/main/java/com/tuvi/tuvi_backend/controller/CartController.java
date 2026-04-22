@@ -2,7 +2,6 @@ package com.tuvi.tuvi_backend.controller;
 
 import com.tuvi.tuvi_backend.dto.ApiResponse;
 import com.tuvi.tuvi_backend.dto.request.AddToCartRequest;
-import com.tuvi.tuvi_backend.entity.User;
 import com.tuvi.tuvi_backend.repository.UserRepository;
 import com.tuvi.tuvi_backend.service.CartService;
 import lombok.RequiredArgsConstructor;

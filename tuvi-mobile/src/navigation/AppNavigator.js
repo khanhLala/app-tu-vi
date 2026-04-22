@@ -39,6 +39,7 @@ import ProductEditScreen from '../screens/ProductEditScreen';
 import RevenueDetailScreen from '../screens/RevenueDetailScreen';
 import ProductOrdersScreen from '../screens/ProductOrdersScreen';
 import AdminOrderDetailScreen from '../screens/AdminOrderDetailScreen';
+import NotificationScreen from '../screens/NotificationScreen';
 
 
 
@@ -181,6 +182,7 @@ const AppNavigator = () => {
 
         <Stack.Screen name="ChartDetail" component={ChartDetailScreen} />
         <Stack.Screen name="CreatePost" component={CreatePostScreen} />
+        <Stack.Screen name="Notifications" component={NotificationScreen} />
 
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="EditProfile" component={EditProfileScreen} />

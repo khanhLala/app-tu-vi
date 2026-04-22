@@ -20,6 +20,7 @@ import com.tuvi.tuvi_backend.repository.ReportRepository;
 import com.tuvi.tuvi_backend.entity.Report;
 import com.tuvi.tuvi_backend.enums.ReportStatus;
 import com.tuvi.tuvi_backend.dto.request.ReportRequest;
+import com.tuvi.tuvi_backend.enums.NotificationType;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class PostService {
     LikeRepository likeRepository;
     CommentRepository commentRepository;
     ReportRepository reportRepository;
+    NotificationService notificationService;
     ObjectMapper objectMapper;
 
 
@@ -90,6 +92,7 @@ public class PostService {
                     .user(user)
                     .build();
             likeRepository.save(like);
+            notificationService.createNotification(post.getAuthor(), user, NotificationType.LIKE, post);
         }
     }
 
@@ -108,6 +111,7 @@ public class PostService {
                 .build();
 
         commentRepository.save(comment);
+        notificationService.createNotification(post.getAuthor(), user, NotificationType.COMMENT, post);
     }
 
     public void deletePost(String postId) {

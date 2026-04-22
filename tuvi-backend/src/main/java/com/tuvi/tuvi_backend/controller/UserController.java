@@ -94,5 +94,13 @@ public class UserController {
                 .message("Người dùng đã được xóa thành công")
                 .build();
     }
+
+    @PutMapping("/notifications/toggle")
+    public ApiResponse<Void> toggleNotifications(@RequestParam boolean enabled) {
+        userService.toggleNotifications(enabled);
+        return ApiResponse.<Void>builder()
+                .message("Trạng thái thông báo đã được cập nhật")
+                .build();
+    }
 }
 

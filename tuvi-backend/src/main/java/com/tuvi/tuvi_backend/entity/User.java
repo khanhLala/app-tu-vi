@@ -56,6 +56,14 @@ public class User {
     )
     Set<Role> roles;
 
+    @Builder.Default
+    @Column(name = "notifications_enabled")
+    Boolean notificationsEnabled = true;
+
+    public Boolean getNotificationsEnabled() {
+        return notificationsEnabled == null ? true : notificationsEnabled;
+    }
+
     @CreationTimestamp
     @Column(name = "created_at")
     java.time.LocalDateTime createdAt;
