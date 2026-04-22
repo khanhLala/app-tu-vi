@@ -150,7 +150,6 @@ const ShopScreen = ({ navigation }) => {
                 <View style={styles.info}>
                   <Text style={styles.category} allowFontScaling={false}>{item.category}</Text>
                   <Text style={styles.itemName} allowFontScaling={false}>{item.name}</Text>
-                  <View style={styles.stars}>{renderStars(4)}</View>
                 </View>
                 <View style={styles.priceTag}>
                   <Text style={styles.price} allowFontScaling={false}>

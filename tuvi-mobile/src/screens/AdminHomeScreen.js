@@ -1,55 +1,117 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Image } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { 
+  StyleSheet, 
+  View, 
+  Text, 
+  TouchableOpacity, 
+  ScrollView, 
+  ActivityIndicator, 
+  Alert, 
+  Image,
+  RefreshControl
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Users, FileText, AlertTriangle, LogOut, Settings, ChevronRight, Activity, ShieldCheck, ShoppingBag } from 'lucide-react-native';
+import { 
+  Users, 
+  FileText, 
+  AlertTriangle, 
+  LogOut, 
+  Settings, 
+  ChevronRight, 
+  Activity, 
+  ShieldCheck, 
+  ShoppingBag,
+  TrendingUp,
+  Package,
+  DollarSign
+} from 'lucide-react-native';
 import axiosClient from '../api/axiosClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AdminHomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({ users: '...', posts: '...', reports: '...' });
+  const [refreshing, setRefreshing] = useState(false);
+  const [stats, setStats] = useState({ 
+    totalUsers: 0, 
+    newUsersToday: 0, 
+    totalPosts: 0, 
+    newPostsToday: 0, 
+    totalRevenue: 0, 
+    revenueToday: 0, 
+    pendingReports: 0 
+  });
   const [profile, setProfile] = useState(null);
+
+  const formatCurrency = (val) => {
+    if (val >= 1000000) {
+      return (val / 1000000).toFixed(1) + 'M';
+    }
+    return val.toLocaleString('vi-VN') + 'đ';
+  };
 
   const fetchData = async () => {
     try {
-      // Gọi song song info và stats (stats tui hardcode placeholder hoặc API có sẵn)
-      const profileData = await axiosClient.get('/users/my-info');
+      const [profileData, statsData] = await Promise.all([
+        axiosClient.get('/users/my-info'),
+        axiosClient.get('/admin/dashboard/stats')
+      ]);
       setProfile(profileData);
-      
-      // Giả lập lấy dữ liệu thống kê nhanh
-      setStats({
-        users: '1.240',
-        posts: '3.812',
-        reports: '12'
-      });
+      setStats(statsData);
     } catch (error) {
       console.log('Admin Home Error:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
   useEffect(() => {
     fetchData();
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchData();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchData();
   }, []);
 
   const handleLogout = async () => {
-    try {
-      const token = await AsyncStorage.getItem('token');
-      if (token) {
-        await axiosClient.post('/auth/logout', { token });
+    Alert.alert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất?', [
+      { text: 'Hủy', style: 'cancel' },
+      {
+        text: 'Đăng xuất',
+        style: 'destructive',
+        onPress: async () => {
+          await AsyncStorage.removeItem('token');
+          navigation.replace('Login');
+        }
       }
-    } catch (error) {
-      console.log('Admin Logout error:', error);
-    } finally {
-      await AsyncStorage.removeItem('token');
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' }],
-      });
-    }
+    ]);
   };
+
+  const StatBox = ({ icon, value, title, todayValue, color, isCurrency, onPress }) => (
+    <TouchableOpacity style={styles.statBox} onPress={onPress}>
+      <View style={styles.statBoxHeader}>
+        {icon}
+        {todayValue > 0 && (
+          <View style={[styles.todayBadge, { backgroundColor: `${color}20` }]}>
+            <Text style={[styles.todayText, { color }]}>
+              +{isCurrency ? formatCurrency(todayValue) : todayValue} hôm nay
+            </Text>
+          </View>
+        )}
+      </View>
+      <Text style={styles.statValue} allowFontScaling={false} numberOfLines={1}>
+        {isCurrency ? formatCurrency(value) : value}
+      </Text>
+      <Text style={styles.statTitle} allowFontScaling={false}>{title}</Text>
+    </TouchableOpacity>
+  );
+
 
   const ActionCard = ({ icon, label, description, color, onPress }) => (
     <TouchableOpacity style={styles.actionCard} onPress={onPress}>
@@ -74,7 +136,7 @@ const AdminHomeScreen = ({ navigation }) => {
 
   return (
     <LinearGradient colors={['#0F172A', '#020617']} style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
         {/* Top Header */}
         <View style={styles.header}>
           <View>
@@ -86,25 +148,52 @@ const AdminHomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent} 
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FBBF24" />
+          }
+        >
           {/* Stats Grid */}
           <View style={styles.statsGrid}>
-            <View style={styles.statBox}>
-              <Activity color="#38BDF8" size={20} />
-              <Text style={styles.statValue} allowFontScaling={false}>{stats.users}</Text>
-              <Text style={styles.statTitle} allowFontScaling={false}>Người dùng</Text>
-            </View>
-            <View style={styles.statBox}>
-              <ShoppingBag color="#FBBF24" size={20} />
-              <Text style={styles.statValue} allowFontScaling={false}>{stats.posts}</Text>
-              <Text style={styles.statTitle} allowFontScaling={false}>Sản phẩm</Text>
-            </View>
-            <View style={styles.statBox}>
-              <AlertTriangle color="#F43F5E" size={20} />
-              <Text style={styles.statValue} allowFontScaling={false}>{stats.reports}</Text>
-              <Text style={styles.statTitle} allowFontScaling={false}>Báo cáo</Text>
-            </View>
+            <StatBox 
+              icon={<Users color="#38BDF8" size={18} />} 
+              value={stats.totalUsers} 
+              title="Người dùng" 
+              todayValue={stats.newUsersToday} 
+              color="#38BDF8"
+              onPress={() => navigation.navigate('UserManagement')}
+            />
+            <StatBox 
+              icon={<FileText color="#FBBF24" size={18} />} 
+              value={stats.totalPosts} 
+              title="Bài viết" 
+              todayValue={stats.newPostsToday} 
+              color="#FBBF24"
+              onPress={() => navigation.navigate('PostManagement', { initialTab: 'POSTS' })}
+            />
+            <StatBox 
+              icon={<DollarSign color="#10B981" size={18} />} 
+              value={stats.totalRevenue} 
+              title="Doanh thu" 
+              todayValue={stats.revenueToday}
+              color="#10B981"
+              isCurrency
+              onPress={() => navigation.navigate('RevenueDetail', { 
+                totalRevenue: stats.totalRevenue, 
+                revenueToday: stats.revenueToday 
+              })}
+            />
+            <StatBox 
+              icon={<AlertTriangle color="#F43F5E" size={18} />} 
+              value={stats.pendingReports} 
+              title="Báo cáo mới" 
+              color="#F43F5E"
+              onPress={() => navigation.navigate('PostManagement', { initialTab: 'REPORTS' })}
+            />
           </View>
+
 
           {/* Quick Actions */}
           <View style={styles.section}>
@@ -115,39 +204,31 @@ const AdminHomeScreen = ({ navigation }) => {
               label="Danh sách Người dùng"
               description="Quản lý thông tin & quyền truy cập"
               color="#38BDF8"
-              onPress={() => {}}
-            />
-            
-            <ActionCard 
-              icon={<ShoppingBag color="#FBBF24" size={24} />}
-              label="Quản lý Cửa hàng"
-              description="Quản lý sản phẩm & đơn hàng"
-              color="#FBBF24"
-              onPress={() => {}}
-            />
-            
-            <ActionCard 
-              icon={<AlertTriangle color="#F43F5E" size={24} />}
-              label="Báo cáo & Vi phạm"
-              description="Xử lý khiếu nại & báo cáo nội dung"
-              color="#F43F5E"
-              onPress={() => {}}
+              onPress={() => navigation.navigate('UserManagement')}
             />
 
             <ActionCard 
-              icon={<Settings color="#94A3B8" size={24} />}
-              label="Cấu hình Hệ thống"
-              description="Chỉnh sửa các tham số ứng dụng"
-              color="#94A3B8"
-              onPress={() => {}}
+              icon={<ShoppingBag color="#818CF8" size={24} />}
+              label="Quản lý Cửa hàng"
+              description="Quản lý sản phẩm & đơn hàng"
+              color="#818CF8"
+              onPress={() => navigation.navigate('ShopManagement')}
+            />
+
+            <ActionCard 
+              icon={<FileText color="#FBBF24" size={24} />}
+              label="Quản lý Bài viết"
+              description="Quản lý bài viết & xử lý báo cáo vi phạm"
+              color="#FBBF24"
+              onPress={() => navigation.navigate('PostManagement')}
             />
           </View>
 
           {/* Logout Section */}
           <View style={styles.footer}>
             <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-              <LogOut color="#EF4444" size={20} />
-              <Text style={styles.logoutText} allowFontScaling={false}>Đăng xuất khỏi trang quản trị</Text>
+              <LogOut color="#F43F5E" size={20} />
+              <Text style={styles.logoutText} allowFontScaling={false}>Đăng xuất tài khoản</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -157,79 +238,103 @@ const AdminHomeScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  loadingContainer: { flex: 1, backgroundColor: '#020617', justifyContent: 'center', alignItems: 'center' },
   container: { flex: 1 },
   safeArea: { flex: 1 },
+  loadingContainer: { flex: 1, backgroundColor: '#020617', justifyContent: 'center', alignItems: 'center' },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
-  welcomeText: { color: '#64748B', fontSize: 14, fontWeight: '500' },
-  adminName: { color: '#F8FAFC', fontSize: 24, fontWeight: 'bold', marginTop: 2 },
+  welcomeText: { color: '#94A3B8', fontSize: 14 },
+  adminName: { color: '#F8FAFC', fontSize: 22, fontWeight: 'bold', marginTop: 4 },
   profileBtn: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(30, 41, 59, 0.5)',
+    backgroundColor: '#1E293B',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#334155',
   },
-  scrollContent: { paddingHorizontal: 20 },
+  scrollContent: { paddingHorizontal: 20, paddingBottom: 40 },
   statsGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 32,
+    marginBottom: 20,
   },
   statBox: {
-    width: '31%',
-    backgroundColor: '#1E293B60',
+    width: '48%',
+    backgroundColor: 'rgba(30, 41, 59, 0.5)',
     borderRadius: 20,
     padding: 16,
-    alignItems: 'center',
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#1E293B',
   },
-  statValue: { color: '#F8FAFC', fontSize: 18, fontWeight: 'bold', marginTop: 10 },
-  statTitle: { color: '#64748B', fontSize: 10, fontWeight: 'bold', marginTop: 4, textTransform: 'uppercase' },
-  section: { marginBottom: 32 },
-  sectionHeader: { color: '#334155', fontSize: 13, fontWeight: 'bold', letterSpacing: 1.5, marginBottom: 16, marginLeft: 8 },
+  statBoxHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  todayBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  todayText: {
+    fontSize: 9,
+    fontWeight: 'bold',
+  },
+  statValue: { color: '#F8FAFC', fontSize: 20, fontWeight: 'bold' },
+  statTitle: { color: '#94A3B8', fontSize: 13, marginTop: 4 },
+  section: { marginTop: 10 },
+  sectionHeader: {
+    color: '#64748B',
+    fontSize: 12,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    marginBottom: 16,
+    marginLeft: 4,
+  },
   actionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(30, 41, 59, 0.3)',
-    padding: 16,
+    backgroundColor: 'rgba(30, 41, 59, 0.5)',
     borderRadius: 20,
+    padding: 16,
     marginBottom: 12,
-    borderWidth: 0.5,
+    borderWidth: 1,
     borderColor: '#1E293B',
   },
   iconWrapper: {
-    width: 52,
-    height: 52,
+    width: 48,
+    height: 48,
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 16,
   },
-  actionInfo: { flex: 1, marginLeft: 16 },
+  actionInfo: { flex: 1 },
   actionLabel: { color: '#F8FAFC', fontSize: 16, fontWeight: 'bold' },
-  actionDesc: { color: '#64748B', fontSize: 12, marginTop: 4 },
-  footer: { marginTop: 10, alignItems: 'center', paddingBottom: 40 },
+  actionDesc: { color: '#64748B', fontSize: 13, marginTop: 2 },
+  footer: { marginTop: 30, alignItems: 'center' },
   logoutBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    backgroundColor: 'rgba(244, 63, 94, 0.1)',
     paddingHorizontal: 24,
-    paddingVertical: 14,
+    paddingVertical: 12,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(244, 63, 94, 0.2)',
   },
-  logoutText: { color: '#EF4444', fontSize: 14, fontWeight: 'bold', marginLeft: 10 },
-  version: { color: '#1E293B', fontSize: 11, marginTop: 24 },
+  logoutText: { color: '#F43F5E', fontSize: 15, fontWeight: 'bold', marginLeft: 10 },
 });
 
 export default AdminHomeScreen;

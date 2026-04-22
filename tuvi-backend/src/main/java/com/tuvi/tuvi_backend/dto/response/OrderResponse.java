@@ -17,8 +17,9 @@ public class OrderResponse {
     String address;
     String phone;
     String paymentMethod;
-    String status;
+    com.tuvi.tuvi_backend.enums.OrderStatus status;
     BigDecimal totalPrice;
+
     String paymentUrl;
     LocalDateTime createdAt;
     List<OrderItemResponse> items;

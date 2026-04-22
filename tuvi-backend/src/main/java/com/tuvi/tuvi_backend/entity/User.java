@@ -7,6 +7,8 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDate;
 import java.util.Set;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -53,4 +55,9 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "role_name")
     )
     Set<Role> roles;
+
+    @CreationTimestamp
+    @Column(name = "created_at")
+    java.time.LocalDateTime createdAt;
 }
+

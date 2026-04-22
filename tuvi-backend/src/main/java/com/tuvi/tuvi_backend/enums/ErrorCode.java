@@ -20,7 +20,9 @@ public enum ErrorCode {
     EMAIL_INVALID(1008, "Định dạng email không hợp lệ", HttpStatus.BAD_REQUEST),
     PASSWORD_INCORRECT(1009, "Mật khẩu cũ không chính xác", HttpStatus.BAD_REQUEST),
     PASSWORDS_NOT_MATCH(1010, "Mật khẩu xác nhận không khớp", HttpStatus.BAD_REQUEST),
+    POST_NOT_EXISTED(1011, "Bài viết không tồn tại", HttpStatus.NOT_FOUND),
     ;
+
 
     ErrorCode(int code, String message, HttpStatus statusCode) {
         this.code = code;

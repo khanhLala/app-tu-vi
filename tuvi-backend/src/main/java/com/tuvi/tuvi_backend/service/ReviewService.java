@@ -6,7 +6,9 @@ import com.tuvi.tuvi_backend.entity.Product;
 import com.tuvi.tuvi_backend.entity.Review;
 import com.tuvi.tuvi_backend.entity.User;
 import com.tuvi.tuvi_backend.repository.OrderRepository;
+import com.tuvi.tuvi_backend.enums.OrderStatus;
 import com.tuvi.tuvi_backend.repository.ProductRepository;
+
 import com.tuvi.tuvi_backend.repository.ReviewRepository;
 import com.tuvi.tuvi_backend.repository.UserRepository;
 import lombok.AccessLevel;
@@ -38,7 +40,8 @@ public class ReviewService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         // Rule 1: Must have a COMPLETED order with this product
-        boolean hasPurchased = orderRepository.hasPurchasedProduct(user.getId(), "COMPLETED", product.getId());
+        boolean hasPurchased = orderRepository.hasPurchasedProduct(user.getId(), OrderStatus.COMPLETED, product.getId());
+
         if (!hasPurchased) {
             System.out.println("Review rejection: User " + username + " (ID: " + user.getId() + ") has not purchased product " + product.getName() + " (ID: " + product.getId() + ") with COMPLETED status.");
             throw new RuntimeException("You can only review products you have purchased and received.");
@@ -77,7 +80,8 @@ public class ReviewService {
         Product product = productRepository.findById(productId).orElse(null);
         if (product == null) return false;
 
-        boolean hasPurchased = orderRepository.hasPurchasedProduct(user.getId(), "COMPLETED", product.getId());
+        boolean hasPurchased = orderRepository.hasPurchasedProduct(user.getId(), OrderStatus.COMPLETED, product.getId());
+
         boolean hasReviewed = reviewRepository.existsByUserIdAndProductId(user.getId(), product.getId());
 
         return hasPurchased && !hasReviewed;
