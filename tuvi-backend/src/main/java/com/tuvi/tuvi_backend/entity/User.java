@@ -58,9 +58,15 @@ public class User {
     )
     Set<Role> roles;
 
+<<<<<<< HEAD
     @CreationTimestamp
     LocalDateTime createdAt;
 
     @UpdateTimestamp
     LocalDateTime updatedAt;
+=======
+    @org.hibernate.annotations.CreationTimestamp
+    @Column(name = "created_at")
+    java.time.LocalDateTime createdAt;
+>>>>>>> main
 }

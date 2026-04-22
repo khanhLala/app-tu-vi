@@ -40,8 +40,14 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         HashSet<Role> roles = new HashSet<>();
-        // Assign default USER role
-        roleRepository.findById("USER").ifPresent(roles::add);
+        if (request.getRoles() != null && !request.getRoles().isEmpty()) {
+            request.getRoles().forEach(roleName -> 
+                roleRepository.findById(roleName).ifPresent(roles::add)
+            );
+        } else {
+            // Assign default USER role
+            roleRepository.findById("USER").ifPresent(roles::add);
+        }
         user.setRoles(roles);
 
         User savedUser = userRepository.save(user);
@@ -116,5 +122,64 @@ public class UserService {
         UserResponse userResponse = userMapper.toUserResponse(user);
         userResponse.setRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
         return userResponse;
+    }
+
+    // Admin methods
+    public java.util.List<UserResponse> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> {
+                    UserResponse response = userMapper.toUserResponse(user);
+                    response.setRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
+                    return response;
+                }).collect(Collectors.toList());
+    }
+
+    public UserResponse getUserById(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        UserResponse response = userMapper.toUserResponse(user);
+        response.setRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
+        return response;
+    }
+
+    public UserResponse updateUser(String id, UserUpdateRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setDob(request.getDob());
+        user.setPhone(request.getPhone());
+        user.setEmail(request.getEmail());
+        user.setAddress(request.getAddress());
+        
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+        
+        if (request.getRoles() != null && !request.getRoles().isEmpty()) {
+            HashSet<Role> roles = new HashSet<>();
+            request.getRoles().forEach(roleName -> 
+                roleRepository.findById(roleName).ifPresent(roles::add)
+            );
+            user.setRoles(roles);
+        }
+
+        User savedUser = userRepository.save(user);
+        UserResponse response = userMapper.toUserResponse(savedUser);
+        response.setRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
+        return response;
+    }
+
+    public void deleteUser(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        
+        // Prevent deleting admin from this endpoint for safety (optional)
+        if (user.getUsername().equals("admin")) {
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION); // Or a specific error
+        }
+        
+        userRepository.deleteById(id);
     }
 }

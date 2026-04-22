@@ -1,6 +1,6 @@
 # lib/models.py
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from lib.lunar import convert_to_lunar, convert_to_solar
 from lib.constants import CHI, HOA_GIAP, SAO_CHU_MENH, SAO_CHU_THAN
 from lib.utils import get_jdn, move
@@ -12,15 +12,24 @@ class TuViChart:
         self.name = name
         self.gender = gender
 
-        # convert sang âm lịch
+        # logic for Ty hour: if solar hour >= 23, move to next solar day for calculations
         if not is_lunar:
             self.solar_date = datetime(year, month, day, hour, minute)
-            self.y, self.m, self.d, isleap_val = convert_to_lunar(year, month, day)
+            calc_solar = self.solar_date
+            if hour >= 23:
+                calc_solar = self.solar_date + timedelta(days=1)
+            
+            self.y, self.m, self.d, isleap_val = convert_to_lunar(calc_solar.year, calc_solar.month, calc_solar.day)
             self.leap = 1 if isleap_val else 0
+            
+            # --- FIX: Use solar components (possibly shifted) for Can Chi ---
+            self.day_can, self.day_chi = self.get_day_can_chi(calc_solar.day, calc_solar.month, calc_solar.year)
         else:
             self.d, self.m, self.y, self.leap = day, month, year, 0 # Assume non-leap for input lunar date
             s_y, s_m, s_d = convert_to_solar(self.y, self.m, self.d, bool(self.leap))
             self.solar_date = datetime(s_y, s_m, s_d, hour, minute)
+            # --- FIX: Use solar equivalent for Can Chi ---
+            self.day_can, self.day_chi = self.get_day_can_chi(s_d, s_m, s_y)
 
         self.view_year = view_year if view_year else (self.solar_date.year if self.solar_date else year)
         self.view_year_can = (self.view_year - 4) % 10
@@ -28,7 +37,7 @@ class TuViChart:
 
         self.year_can, self.year_chi = self.get_year_can_chi(self.y)
         self.month_can, self.month_chi = self.get_month_can_chi(self.year_can, self.m)
-        self.day_can, self.day_chi = self.get_day_can_chi(self.d, self.m, self.y)
+        # self.day_can derived in __init__ blocks above
         self.hour_can, self.hour_chi = self.get_hour_can_chi(self.day_can, hour, minute)
 
         self.can_idx = self.year_can

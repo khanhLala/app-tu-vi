@@ -10,5 +10,9 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, String> {
     List<Post> findAllByOrderByCreatedAtDesc();
+<<<<<<< HEAD
     long countByCreatedAtAfter(LocalDateTime dateTime);
+=======
+    long countByCreatedAtAfter(java.time.LocalDateTime date);
+>>>>>>> main
 }

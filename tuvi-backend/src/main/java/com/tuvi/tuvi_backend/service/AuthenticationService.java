@@ -62,9 +62,16 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                .orElseThrow(() -> {
+                    log.warn("Authenticate failed: User {} not found", request.getUsername());
+                    return new AppException(ErrorCode.USER_NOT_EXISTED);
+                });
 
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        log.info("Authenticate user: {}, password length: {}, match: {}", 
+                request.getUsername(), 
+                request.getPassword() != null ? request.getPassword().length() : 0, 
+                authenticated);
 
         if (!authenticated) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);

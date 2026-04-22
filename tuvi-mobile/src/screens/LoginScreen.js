@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  Image, 
-  KeyboardAvoidingView, 
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  KeyboardAvoidingView,
   Platform,
   Alert,
   ActivityIndicator,
@@ -35,43 +35,69 @@ const LoginScreen = ({ navigation }) => {
     try {
       const trimmedUsername = username.trim();
       const trimmedPassword = password.trim();
-      
+
       console.log(`Đang đăng nhập user: [${trimmedUsername}]`);
-      
-      const result = await axiosClient.post('/auth/token', { 
-        username: trimmedUsername, 
-        password: trimmedPassword 
+
+      const result = await axiosClient.post('/auth/token', {
+        username: trimmedUsername,
+        password: trimmedPassword
       });
-      
+
       console.log('>>> [LOGIN] Result:', result);
 
       if (result && result.token) {
+        console.log('Login successful, token received. Saving to AsyncStorage...');
         await AsyncStorage.setItem('token', result.token);
-        
-        // Cần fetch profile để lấy quyền (Admin/User) trước khi truyền vào context
-        const profile = await axiosClient.get('/users/my-info');
-        console.log('>>> [LOGIN] Profile fetched:', profile);
-        
-        console.log('>>> [LOGIN] Invoking auth.login context update');
-        auth.login(result.token, profile);
+
+        // Kiểm tra quyền ngay sau khi login
+        try {
+          const profile = await axiosClient.get('/users/my-info');
+          console.log('Profile fetched:', profile);
+          const isAdmin = profile?.roles?.includes('ADMIN');
+
+          if (isAdmin) {
+            if (Platform.OS === 'web') {
+              console.log('Web detected, navigating immediately to AdminMain...');
+              navigation.replace('AdminMain');
+            } else {
+              Alert.alert(
+                'Thành công',
+                'Chào mừng bạn quay trở lại trang quản trị!',
+                [{
+                  text: 'Vào Dashboard', onPress: () => {
+                    console.log('Navigating to AdminMain...');
+                    navigation.replace('AdminMain');
+                  }
+                }]
+              );
+            }
+          } else {
+            if (Platform.OS === 'web') {
+              console.log('Web detected, navigating immediately to Main...');
+              navigation.replace('Main');
+            } else {
+              Alert.alert(
+                'Thành công',
+                'Chào mừng bạn đến với Tử Vi App!',
+                [{
+                  text: 'Bắt đầu', onPress: () => {
+                    console.log('Navigating to Main...');
+                    navigation.replace('Main');
+                  }
+                }]
+              );
+            }
+          }
+        } catch (infoError) {
+          console.log('Error fetching role after login:', infoError);
+          // Defaults to Main if info check fails
+          navigation.replace('Main');
+        }
       }
     } catch (error) {
-      console.error('>>> [LOGIN] Error Details:', error);
-      let message = 'Tên đăng nhập hoặc mật khẩu không đúng.';
-      
-      if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
-        message = 'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối mạng hoặc thử lại sau.';
-      } else if (error.detail) {
-        message = error.detail;
-      } else if (error.message) {
-        message = error.message;
-      }
-
-      if (Platform.OS === 'web') {
-          window.alert(`Lỗi đăng nhập: ${message}`);
-      } else {
-          Alert.alert('Lỗi đăng nhập', message);
-      }
+      // Ưu tiên lấy message từ ApiResponse của Backend
+      const message = error.message || error.detail || 'Tên đăng nhập hoặc mật khẩu không chính xác.';
+      Alert.alert('Lỗi đăng nhập', message);
     } finally {
       setLoading(false);
     }
@@ -80,68 +106,68 @@ const LoginScreen = ({ navigation }) => {
   return (
     <LinearGradient colors={['#0F172A', '#1E293B']} style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-        <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.inner}
-      >
-        <View style={styles.header}>
-          <Text style={styles.title} allowFontScaling={false}>TỬ VI</Text>
-          <Text style={styles.subtitle} allowFontScaling={false}>KIẾN GIẢI VẬN MỆNH - ĐỊNH HƯỚNG TƯƠNG LAI</Text>
-        </View>
-
-        <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <User color="#94A3B8" size={20} style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Tên đăng nhập"
-              placeholderTextColor="#64748B"
-              value={username}
-              onChangeText={setUsername}
-              autoCapitalize="none"
-            />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.inner}
+        >
+          <View style={styles.header}>
+            <Text style={styles.title} allowFontScaling={false}>TỬ VI</Text>
+            <Text style={styles.subtitle} allowFontScaling={false}>KIẾN GIẢI VẬN MỆNH - ĐỊNH HƯỚNG TƯƠNG LAI</Text>
           </View>
 
-          <View style={styles.inputGroup}>
-            <Lock color="#94A3B8" size={20} style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Mật khẩu"
-              placeholderTextColor="#64748B"
-              secureTextEntry={!showPassword}
-              value={password}
-              onChangeText={setPassword}
-            />
-            <TouchableOpacity 
-              onPress={() => setShowPassword(!showPassword)}
-              style={styles.eyeBtn}
+          <View style={styles.form}>
+            <View style={styles.inputGroup}>
+              <User color="#94A3B8" size={20} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Tên đăng nhập"
+                placeholderTextColor="#64748B"
+                value={username}
+                onChangeText={setUsername}
+                autoCapitalize="none"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Lock color="#94A3B8" size={20} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Mật khẩu"
+                placeholderTextColor="#64748B"
+                secureTextEntry={!showPassword}
+                value={password}
+                onChangeText={setPassword}
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={styles.eyeBtn}
+              >
+                {showPassword ? <EyeOff color="#94A3B8" size={20} /> : <Eye color="#94A3B8" size={20} />}
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={styles.loginBtn}
+              onPress={handleLogin}
+              disabled={loading}
             >
-              {showPassword ? <EyeOff color="#94A3B8" size={20} /> : <Eye color="#94A3B8" size={20} />}
+              {loading ? (
+                <ActivityIndicator color="#0F172A" />
+              ) : (
+                <Text style={styles.loginText} allowFontScaling={false}>ĐĂNG NHẬP</Text>
+              )}
             </TouchableOpacity>
-          </View>
 
-          <TouchableOpacity 
-            style={styles.loginBtn}
-            onPress={handleLogin}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#0F172A" />
-            ) : (
-              <Text style={styles.loginText} allowFontScaling={false}>ĐĂNG NHẬP</Text>
-            )}
-          </TouchableOpacity>
-
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Chưa có tài khoản? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text style={styles.registerLink}>Đăng ký ngay</Text>
-            </TouchableOpacity>
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Chưa có tài khoản? </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                <Text style={styles.registerLink}>Đăng ký ngay</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  </LinearGradient>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
@@ -202,11 +228,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 24,
-    shadowColor: '#FBBF24',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
   },
   loginText: {
     color: '#0F172A',

@@ -12,5 +12,9 @@ import java.util.List;
 public interface TuViProfileRepository extends JpaRepository<TuViProfile, String> {
     List<TuViProfile> findAllByUserOrderByCreatedAtDesc(User user);
     void deleteAllByUser(User user);
+<<<<<<< HEAD
     long countByCreatedAtAfter(LocalDateTime dateTime);
+=======
+    long countByCreatedAtAfter(java.time.LocalDateTime date);
+>>>>>>> main
 }

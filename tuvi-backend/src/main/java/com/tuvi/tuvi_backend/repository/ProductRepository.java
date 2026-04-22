@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, String> {
+    long countByCreatedAtAfter(java.time.LocalDateTime date);
 }

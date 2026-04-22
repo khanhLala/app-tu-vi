@@ -66,6 +66,23 @@ public class CartService {
         cartItemRepository.delete(cartItem);
     }
 
+    public CartItemResponse updateQuantity(String userId, String cartItemId, Integer quantity) {
+        CartItem cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+
+        if (!cartItem.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        if (quantity <= 0) {
+            cartItemRepository.delete(cartItem);
+            return null;
+        }
+
+        cartItem.setQuantity(quantity);
+        return mapToCartItemResponse(cartItemRepository.save(cartItem));
+    }
+
     private CartItemResponse mapToCartItemResponse(CartItem cartItem) {
         return CartItemResponse.builder()
                 .id(cartItem.getId())

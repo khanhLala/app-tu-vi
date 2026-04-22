@@ -28,6 +28,8 @@ import OrderHistoryScreen from '../screens/OrderHistoryScreen';
 import VietQRPaymentScreen from '../screens/VietQRPaymentScreen';
 import ReviewScreen from '../screens/ReviewScreen';
 import ChatScreen from '../screens/ChatScreen';
+import AdminHomeScreen from '../screens/AdminHomeScreen';
+import UserManagementScreen from '../screens/UserManagementScreen';
 
 // Admin Screens
 import AdminDashboardScreen from '../screens/admin/AdminDashboardScreen';
@@ -50,7 +52,7 @@ const TabIcon = ({ name, color, size }) => {
         const IconComponent = LucideWeb[name];
         return IconComponent ? <IconComponent color={color} size={size} /> : null;
     }
-    
+
     try {
         const LucideNative = require('lucide-react-native');
         const IconComponent = LucideNative[name];
@@ -66,11 +68,11 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
     const { unreadCount } = useNotifications();
 
     return (
-        <View style={{ 
-            flexDirection: 'row', 
-            height: 60 + safeBottom, 
-            backgroundColor: '#0F172A', 
-            borderTopWidth: 1, 
+        <View style={{
+            flexDirection: 'row',
+            height: 60 + safeBottom,
+            backgroundColor: '#0F172A',
+            borderTopWidth: 1,
             borderTopColor: '#334155',
             paddingBottom: safeBottom > 0 ? safeBottom : 5,
             paddingTop: 5,
@@ -137,120 +139,49 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
     );
 };
 
-const UserTabs = () => {
-    return (
-        <Tab.Navigator 
-            tabBar={props => <CustomTabBar {...props} />}
-            screenOptions={{ headerShown: false }}
-        >
-            <Tab.Screen name="CalculateTab" component={CreateChartScreen} options={{ tabBarLabel: "Lập lá số" }} />
-            <Tab.Screen name="ShopTab" component={ShopScreen} options={{ tabBarLabel: "Cửa hàng" }} />
-            <Tab.Screen name="SocialTab" component={SocialFeedScreen} options={{ tabBarLabel: "Cộng đồng" }} />
-            <Tab.Screen name="NotiTab" component={NotificationScreen} options={{ tabBarLabel: "Thông báo" }} />
-            <Tab.Screen name="SettingsTab" component={SettingsScreen} options={{ tabBarLabel: "Cài đặt" }} />
-        </Tab.Navigator>
-    );
-};
-
-const AdminTabs = () => {
-    return (
-        <Tab.Navigator 
-            tabBar={props => <CustomTabBar {...props} />}
-            screenOptions={{ headerShown: false }}
-        >
-            <Tab.Screen name="AdminDashboardTab" component={AdminDashboardScreen} options={{ tabBarLabel: "Tổng quan" }} />
-            <Tab.Screen name="AdminUsersTab" component={AdminUserManagerScreen} options={{ tabBarLabel: "Người dùng" }} />
-            <Tab.Screen name="AdminProductsTab" component={AdminProductManagerScreen} options={{ tabBarLabel: "Sản phẩm" }} />
-            <Tab.Screen name="AdminReportsTab" component={AdminReportManagerScreen} options={{ tabBarLabel: "Báo cáo" }} />
-            <Tab.Screen name="AdminSettingsTab" component={SettingsScreen} options={{ tabBarLabel: "Cài đặt" }} />
-        </Tab.Navigator>
-    );
-};
-
-// --- STACKS ---
-
-const AdminStack = () => (
-    <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: '#0F172A' } }}>
-        <Stack.Screen name="AdminMain" component={AdminTabs} />
-        <Stack.Screen name="AdminUsers" component={AdminUserManagerScreen} />
-        <Stack.Screen name="AdminReports" component={AdminReportManagerScreen} />
-        <Stack.Screen name="AdminProducts" component={AdminProductManagerScreen} />
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-        <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-        <Stack.Screen name="History" component={ProfileListScreen} />
-        <Stack.Screen name="ChartDetail" component={ChartDetailScreen} />
-        <Stack.Screen name="Security" component={SecurityScreen} />
-        <Stack.Screen name="Support" component={SupportScreen} />
-    </Stack.Navigator>
-);
-
-const UserStack = () => (
-    <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: '#0F172A' } }}>
-        <Stack.Screen name="UserMain" component={UserTabs} />
-        <Stack.Screen name="History" component={ProfileListScreen} />
-        <Stack.Screen name="ChartDetail" component={ChartDetailScreen} />
-        <Stack.Screen name="CreatePost" component={CreatePostScreen} />
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-        <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-        <Stack.Screen name="Security" component={SecurityScreen} />
-        <Stack.Screen name="Support" component={SupportScreen} />
-        <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
-        <Stack.Screen name="Cart" component={CartScreen} />
-        <Stack.Screen name="Checkout" component={CheckoutScreen} />
-        <Stack.Screen name="OrderSuccess" component={OrderSuccessScreen} />
-        <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
-        <Stack.Screen name="VietQRPayment" component={VietQRPaymentScreen} />
-        <Stack.Screen name="Review" component={ReviewScreen} />
-        <Stack.Screen name="Chat" component={ChatScreen} />
-    </Stack.Navigator>
-);
-
-// --- MAIN NAVIGATOR ---
-
-const NavigationContent = () => {
-    const { token, isAdmin, isLoading } = useAuth();
-
-    if (isLoading) {
-        return (
-            <View style={{ flex: 1, backgroundColor: '#0F172A', justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" color="#FBBF24" />
-            </View>
-        );
-    }
-
-    return (
-        <NavigationContainer theme={{ 
-            dark: true, 
-            colors: { 
-                primary: '#FBBF24', 
-                background: '#0F172A', 
-                card: '#0F172A', 
-                text: '#F8FAFC', 
-                border: '#334155', 
-                notification: '#EF4444' 
-            } 
-        }}>
-            {!token ? (
-                <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: '#0F172A' } }}>
-                    <Stack.Screen name="Login" component={LoginScreen} />
-                    <Stack.Screen name="Register" component={RegisterScreen} />
-                </Stack.Navigator>
-            ) : isAdmin ? (
-                <AdminStack />
-            ) : (
-                <UserStack />
-            )}
-        </NavigationContainer>
-    );
-};
-
 const AppNavigator = () => {
     return (
-        <AuthProvider>
-            <NotificationProvider>
-                <NavigationContent />
-            </NotificationProvider>
-        </AuthProvider>
+        <NavigationContainer theme={MyTheme}>
+            <Stack.Navigator
+                initialRouteName="Login"
+                screenOptions={{
+                    headerShown: false,
+                    cardStyle: { backgroundColor: '#0F172A' },
+                    detachPreviousScreen: false, // Giữ màn hình cũ để tránh chớp trắng khi back
+                }}
+            >
+                <Stack.Screen name="Login" component={LoginScreen} />
+                <Stack.Screen name="Register" component={RegisterScreen} />
+                <Stack.Screen name="Main" component={MainTabs} />
+                <Stack.Screen name="AdminMain" component={AdminHomeScreen} />
+                <Stack.Screen name="History" component={ProfileListScreen} />
+                <Stack.Screen name="ChartDetail" component={ChartDetailScreen} />
+                <Stack.Screen name="Security" component={SecurityScreen} />
+                <Stack.Screen name="Support" component={SupportScreen} />
+            </Stack.Navigator>
+            );
+
+const UserStack = () => (
+            <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: '#0F172A' } }}>
+                <Stack.Screen name="UserMain" component={UserTabs} />
+                <Stack.Screen name="History" component={ProfileListScreen} />
+                <Stack.Screen name="ChartDetail" component={ChartDetailScreen} />
+                <Stack.Screen name="CreatePost" component={CreatePostScreen} />
+                <Stack.Screen name="Profile" component={ProfileScreen} />
+                <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+                <Stack.Screen name="Security" component={SecurityScreen} />
+                <Stack.Screen name="Support" component={SupportScreen} />
+                <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
+                <Stack.Screen name="Cart" component={CartScreen} />
+                <Stack.Screen name="Checkout" component={CheckoutScreen} />
+                <Stack.Screen name="OrderSuccess" component={OrderSuccessScreen} />
+                <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+                <Stack.Screen name="VietQRPayment" component={VietQRPaymentScreen} />
+                <Stack.Screen name="Review" component={ReviewScreen} />
+                <Stack.Screen name="Chat" component={ChatScreen} />
+                <Stack.Screen name="UserManagement" component={UserManagementScreen} />
+            </Stack.Navigator>
+        </NavigationContainer>
     );
 };
 

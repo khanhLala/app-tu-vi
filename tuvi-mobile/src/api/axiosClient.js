@@ -3,8 +3,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
 const axiosClient = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL || 
-           (Platform.OS === 'web' ? 'http://localhost:8080/api/v1' : 'http://192.168.110.42:8080/api/v1'), 
+  baseURL: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.7.47:8080/api/v1',
+
+
   headers: {
     'Content-Type': 'application/json',
   },
@@ -24,11 +25,18 @@ const onRefreshed = (token) => {
 
 // Interceptor để tự động gắn Token vào Headers
 axiosClient.interceptors.request.use(async (config) => {
-  // Không gắn token cho các endpoint công khai (Login, Register)
-  const publicEndpoints = ['/auth/token', '/users'];
-  const isPublicEndpoint = publicEndpoints.some(endpoint => config.url.endsWith(endpoint));
+  // Chuẩn hóa URL để kiểm tra (bỏ baseURL nếu có)
+  const url = config.url || '';
+  const publicEndpoints = ['/auth/token', '/auth/introspect', '/users'];
 
-  if (isPublicEndpoint && config.method === 'post') {
+  // Kiểm tra xem có phải endpoint công khai không
+  const isPublicEndpoint = publicEndpoints.some(endpoint =>
+    url === endpoint || url.endsWith(endpoint)
+  );
+
+  // Nếu là POST vào endpoint công khai thì không gửi token
+  if (isPublicEndpoint && config.method?.toLowerCase() === 'post') {
+    console.log(`[Request] Public endpoint detected: ${url}, skipping token.`);
     return config;
   }
 
@@ -43,8 +51,13 @@ axiosClient.interceptors.request.use(async (config) => {
 
 // Interceptor để xử lý lỗi tập trung từ ApiResponse của Spring Boot và Silent Refresh
 axiosClient.interceptors.response.use((response) => {
-  if (response.data && response.data.code === 1000) {
-    return response.data.result;
+  if (response.data) {
+    if (response.data.code === 1000) {
+      return response.data.result;
+    } else {
+      // Nếu có code khác 1000 thì coi như lỗi và reject
+      return Promise.reject(response.data);
+    }
   }
   return response;
 }, async (error) => {
@@ -53,8 +66,15 @@ axiosClient.interceptors.response.use((response) => {
 
   // Nếu là lỗi 401 và không phải là yêu cầu refresh chính nó
   if (response && response.status === 401 && !originalRequest._retry) {
-    if (originalRequest.url.endsWith('/auth/refresh') || originalRequest.url.endsWith('/auth/logout')) {
-      // Nếu chính request refresh hoặc logout lỗi 401 thì xóa token và reject luôn
+    // Không tự động refresh nếu đang ở màn hình Login/Register
+    const isAuthEndpoint = originalRequest.url.endsWith('/auth/token') || originalRequest.url.endsWith('/users');
+    if (isAuthEndpoint) {
+      return Promise.reject(error.response?.data || error);
+    }
+
+    if (originalRequest.url.endsWith('/auth/refresh')) {
+      // Nếu chính request refresh cũng lỗi 401 thì logout luôn
+      console.log('[Response] Refresh token failed with 401, logging out.');
       await AsyncStorage.removeItem('token');
       return Promise.reject(error);
     }
