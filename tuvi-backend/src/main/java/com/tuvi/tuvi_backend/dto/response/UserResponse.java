@@ -22,4 +22,5 @@ public class UserResponse {
     String address;
     String avatarUrl;
     Set<String> roles;
+    Boolean notificationsEnabled;
 }

@@ -160,5 +160,16 @@ public class UserService {
     public void deleteUser(String id) {
         userRepository.deleteById(id);
     }
+
+    public void toggleNotifications(boolean enabled) {
+        var context = org.springframework.security.core.context.SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+
+        User user = userRepository.findByUsername(name)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        user.setNotificationsEnabled(enabled);
+        userRepository.save(user);
+    }
 }
 

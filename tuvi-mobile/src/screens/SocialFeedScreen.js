@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Plus } from 'lucide-react-native';
+import { Plus, Bell } from 'lucide-react-native';
 import axiosClient from '../api/axiosClient';
 import PostCard from '../components/PostCard';
 import { Alert } from 'react-native';
@@ -13,6 +13,17 @@ const SocialFeedScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchUnreadCount = async () => {
+    try {
+      const response = await axiosClient.get('/notifications');
+      const unread = response.filter(n => !n.isRead).length;
+      setUnreadCount(unread);
+    } catch (e) {
+      console.log('Error fetching unread count');
+    }
+  };
 
   const fetchUser = async () => {
     try {
@@ -44,6 +55,7 @@ const SocialFeedScreen = ({ navigation }) => {
     const unsubscribe = navigation.addListener('focus', () => {
       fetchUser();
       fetchFeed();
+      fetchUnreadCount();
     });
 
     return () => {
@@ -124,7 +136,19 @@ const SocialFeedScreen = ({ navigation }) => {
     <LinearGradient colors={['#0F172A', '#1E293B']} style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         <View style={styles.header}>
+          <View style={{ width: 40 }} />
           <Text style={styles.title} allowFontScaling={false}>CỘNG ĐỒNG</Text>
+          <TouchableOpacity 
+            style={styles.notificationBtn} 
+            onPress={() => navigation.navigate('Notifications')}
+          >
+            <Bell color="#FBBF24" size={24} />
+            {unreadCount > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
 
         <FlatList
@@ -173,9 +197,34 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 20,
     backgroundColor: '#0F172A',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
     borderBottomWidth: 0.5,
     borderBottomColor: '#334155',
+  },
+  notificationBtn: {
+    padding: 8,
+    position: 'relative',
+  },
+  badge: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: '#EF4444',
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#0F172A',
+  },
+  badgeText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   title: { color: '#FBBF24', fontSize: 18, fontWeight: 'bold' },
   listContent: { padding: 16, paddingBottom: 100 },

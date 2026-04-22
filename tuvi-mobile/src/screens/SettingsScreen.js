@@ -105,13 +105,30 @@ const SettingsScreen = ({ navigation }) => {
     }
   };
 
-  const SettingItem = ({ icon, label, onPress, type = 'link' }) => (
-    <TouchableOpacity style={styles.item} onPress={onPress}>
+  const handleToggleNotifications = async (value) => {
+    try {
+      await axiosClient.put(`/users/notifications/toggle?enabled=${value}`);
+      setProfile(prev => ({ ...prev, notificationsEnabled: value }));
+    } catch (error) {
+      Alert.alert('Lỗi', 'Không thể cập nhật cài đặt thông báo.');
+    }
+  };
+
+  const SettingItem = ({ icon, label, onPress, type = 'link', value, onValueChange }) => (
+    <TouchableOpacity style={styles.item} onPress={onPress} disabled={type === 'switch'}>
       <View style={styles.itemLeft}>
         <View style={styles.iconContainer}>{icon}</View>
         <Text style={styles.itemLabel} allowFontScaling={false}>{label}</Text>
       </View>
-      {type === 'link' ? <ChevronRight color="#64748B" size={20} /> : <Switch value={true} trackColor={{ false: '#334155', true: '#FBBF24' }} />}
+      {type === 'link' ? (
+        <ChevronRight color="#64748B" size={20} />
+      ) : (
+        <Switch 
+          value={value} 
+          onValueChange={onValueChange}
+          trackColor={{ false: '#334155', true: '#FBBF24' }} 
+        />
+      )}
     </TouchableOpacity>
   );
 
@@ -177,7 +194,13 @@ const SettingsScreen = ({ navigation }) => {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>ỨNG DỤNG</Text>
-            <SettingItem icon={<Bell color="#94A3B8" size={20} />} label="Thông báo" type="switch" />
+            <SettingItem 
+              icon={<Bell color="#94A3B8" size={20} />} 
+              label="Thông báo" 
+              type="switch" 
+              value={profile?.notificationsEnabled ?? true}
+              onValueChange={handleToggleNotifications}
+            />
             <SettingItem
               icon={<CircleHelp color="#94A3B8" size={20} />}
               label="Hỗ trợ & Góp ý"
