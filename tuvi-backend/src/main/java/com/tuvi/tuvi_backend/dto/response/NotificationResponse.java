@@ -1,5 +1,6 @@
 package com.tuvi.tuvi_backend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tuvi.tuvi_backend.enums.NotificationType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -17,7 +18,7 @@ public class NotificationResponse {
     String actorAvatar;
     NotificationType type;
     String postId;
-    @com.fasterxml.jackson.annotation.JsonProperty("isRead")
+    @JsonProperty("isRead")
     boolean isRead;
     LocalDateTime createdAt;
 }

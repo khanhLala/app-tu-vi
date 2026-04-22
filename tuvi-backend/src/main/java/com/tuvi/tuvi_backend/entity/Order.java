@@ -8,7 +8,9 @@ import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 @Data
 @Builder
@@ -43,13 +45,13 @@ public class Order {
     OrderStatus status;
 
 
-    @org.hibernate.annotations.CreationTimestamp
+    @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @Builder.Default
-    List<OrderItem> items = new java.util.ArrayList<>();
+    List<OrderItem> items = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
