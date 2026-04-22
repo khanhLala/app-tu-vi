@@ -29,4 +29,6 @@ public class UserCreationRequest {
     String email;
     
     String address;
+
+    java.util.Set<String> roles;
 }

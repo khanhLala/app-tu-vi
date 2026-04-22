@@ -29,6 +29,7 @@ import VietQRPaymentScreen from '../screens/VietQRPaymentScreen';
 import ReviewScreen from '../screens/ReviewScreen';
 import ChatScreen from '../screens/ChatScreen';
 import AdminHomeScreen from '../screens/AdminHomeScreen';
+import UserManagementScreen from '../screens/UserManagementScreen';
 
 
 const Stack = createStackNavigator();
@@ -179,6 +180,7 @@ const AppNavigator = () => {
         <Stack.Screen name="VietQRPayment" component={VietQRPaymentScreen} />
         <Stack.Screen name="Review" component={ReviewScreen} />
         <Stack.Screen name="Chat" component={ChatScreen} />
+        <Stack.Screen name="UserManagement" component={UserManagementScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

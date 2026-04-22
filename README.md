@@ -8,7 +8,7 @@
 **Tử Vi App** là một hệ sinh thái toàn diện được thiết kế để mang lại trải nghiệm lập lá số Tử Vi chính xác, kết hợp sức mạnh của AI để luận giải và một mạng xã hội thu nhỏ để cộng đồng cùng nghiệm lý.
 
 
----
+
 
 ## 🛠️ Công nghệ sử dụng
 

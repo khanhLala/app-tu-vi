@@ -34,5 +34,6 @@ public class TuViProfile {
     @JoinColumn(name = "user_id")
     User user;
 
+    @org.hibernate.annotations.CreationTimestamp
     LocalDateTime createdAt;
 }

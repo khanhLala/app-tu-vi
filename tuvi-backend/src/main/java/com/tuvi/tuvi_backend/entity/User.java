@@ -53,4 +53,8 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "role_name")
     )
     Set<Role> roles;
+
+    @org.hibernate.annotations.CreationTimestamp
+    @Column(name = "created_at")
+    java.time.LocalDateTime createdAt;
 }

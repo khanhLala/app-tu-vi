@@ -24,4 +24,7 @@ public class UserUpdateRequest {
     String email;
     
     String address;
+
+    String password;
+    java.util.Set<String> roles;
 }

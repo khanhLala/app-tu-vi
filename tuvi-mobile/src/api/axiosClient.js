@@ -27,9 +27,9 @@ axiosClient.interceptors.request.use(async (config) => {
   // Chuẩn hóa URL để kiểm tra (bỏ baseURL nếu có)
   const url = config.url || '';
   const publicEndpoints = ['/auth/token', '/auth/introspect', '/users'];
-  
+
   // Kiểm tra xem có phải endpoint công khai không
-  const isPublicEndpoint = publicEndpoints.some(endpoint => 
+  const isPublicEndpoint = publicEndpoints.some(endpoint =>
     url === endpoint || url.endsWith(endpoint)
   );
 
@@ -63,10 +63,14 @@ axiosClient.interceptors.response.use((response) => {
   const { config, response } = error;
   const originalRequest = config;
 
-  // Nếu là lỗi 401 và không phải là yêu cầu refresh chính nó hoặc yêu cầu login
-  const isAuthRequest = originalRequest.url.endsWith('/auth/token') || originalRequest.url.endsWith('/auth/refresh');
+  // Nếu là lỗi 401 và không phải là yêu cầu refresh chính nó
+  if (response && response.status === 401 && !originalRequest._retry) {
+    // Không tự động refresh nếu đang ở màn hình Login/Register
+    const isAuthEndpoint = originalRequest.url.endsWith('/auth/token') || originalRequest.url.endsWith('/users');
+    if (isAuthEndpoint) {
+      return Promise.reject(error.response?.data || error);
+    }
 
-  if (response && response.status === 401 && !isAuthRequest && !originalRequest._retry) {
     if (originalRequest.url.endsWith('/auth/refresh')) {
       // Nếu chính request refresh cũng lỗi 401 thì logout luôn
       console.log('[Response] Refresh token failed with 401, logging out.');

@@ -6,11 +6,11 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, Trash2, ShoppingCart } from 'lucide-react-native';
+import { ArrowLeft, Trash2, ShoppingCart, Plus, Minus } from 'lucide-react-native';
 import { useCart } from '../context/CartContext';
 
 const CartScreen = ({ navigation }) => {
-  const { cartItems, fetchCart, removeFromCart } = useCart();
+  const { cartItems, fetchCart, removeFromCart, updateCartQuantity } = useCart();
   const [loading, setLoading] = React.useState(true);
   const insets = useSafeAreaInsets();
 
@@ -35,6 +35,15 @@ const CartScreen = ({ navigation }) => {
     ]);
   };
 
+  const handleUpdateQuantity = (cartItemId, currentQty, delta) => {
+    const newQty = currentQty + delta;
+    if (newQty <= 0) {
+      handleRemove(cartItemId);
+    } else {
+      updateCartQuantity(cartItemId, newQty);
+    }
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.cartItem}>
       {item.productImageUrl ? (
@@ -49,7 +58,22 @@ const CartScreen = ({ navigation }) => {
         <Text style={styles.itemPrice} allowFontScaling={false}>
           {Number(item.productPrice).toLocaleString('vi-VN')}đ
         </Text>
-        <Text style={styles.itemQty} allowFontScaling={false}>Số lượng: {item.quantity}</Text>
+        
+        <View style={styles.quantityContainer}>
+          <TouchableOpacity 
+            style={styles.qtyBtn} 
+            onPress={() => handleUpdateQuantity(item.id, item.quantity, -1)}
+          >
+            <Minus color="#94A3B8" size={16} />
+          </TouchableOpacity>
+          <Text style={styles.quantityText} allowFontScaling={false}>{item.quantity}</Text>
+          <TouchableOpacity 
+            style={styles.qtyBtn} 
+            onPress={() => handleUpdateQuantity(item.id, item.quantity, 1)}
+          >
+            <Plus color="#FBBF24" size={16} />
+          </TouchableOpacity>
+        </View>
       </View>
       <TouchableOpacity onPress={() => handleRemove(item.id)} style={styles.deleteBtn}>
         <Trash2 color="#EF4444" size={20} />
@@ -132,7 +156,29 @@ const styles = StyleSheet.create({
   itemInfo: { flex: 1, paddingHorizontal: 12 },
   itemName: { color: '#F8FAFC', fontSize: 14, fontWeight: '600', marginBottom: 4 },
   itemPrice: { color: '#FBBF24', fontSize: 15, fontWeight: 'bold', marginBottom: 4 },
-  itemQty: { color: '#64748B', fontSize: 13 },
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    gap: 12,
+  },
+  qtyBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#1E293B',
+    borderWidth: 1,
+    borderColor: '#334155',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quantityText: {
+    color: '#F8FAFC',
+    fontSize: 16,
+    fontWeight: 'bold',
+    minWidth: 24,
+    textAlign: 'center',
+  },
   deleteBtn: { padding: 8 },
   emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 },
   emptyTitle: { color: '#F8FAFC', fontSize: 20, fontWeight: 'bold', marginTop: 16, marginBottom: 8 },

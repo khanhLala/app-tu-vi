@@ -2,27 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Users, FileText, AlertTriangle, LogOut, Settings, ChevronRight, Activity, ShieldCheck, ShoppingBag } from 'lucide-react-native';
+import { Users, FileText, AlertTriangle, LogOut, Settings, ChevronRight, Activity, ShieldCheck, ShoppingBag, Package, MessageSquare, Plus } from 'lucide-react-native';
 import axiosClient from '../api/axiosClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AdminHomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({ users: '...', posts: '...', reports: '...' });
+  const [stats, setStats] = useState(null);
   const [profile, setProfile] = useState(null);
+
+  const formatNumber = (num) => {
+    return num?.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.') || '0';
+  };
 
   const fetchData = async () => {
     try {
-      // Gọi song song info và stats (stats tui hardcode placeholder hoặc API có sẵn)
-      const profileData = await axiosClient.get('/users/my-info');
+      const [profileData, statsData] = await Promise.all([
+        axiosClient.get('/users/my-info'),
+        axiosClient.get('/stats/summary')
+      ]);
       setProfile(profileData);
-      
-      // Giả lập lấy dữ liệu thống kê nhanh
-      setStats({
-        users: '1.240',
-        posts: '3.812',
-        reports: '12'
-      });
+      setStats(statsData);
     } catch (error) {
       console.log('Admin Home Error:', error);
     } finally {
@@ -81,7 +81,7 @@ const AdminHomeScreen = ({ navigation }) => {
             <Text style={styles.welcomeText} allowFontScaling={false}>Chào Quản trị viên,</Text>
             <Text style={styles.adminName} allowFontScaling={false}>{profile?.firstName || profile?.username || 'Admin'}</Text>
           </View>
-          <TouchableOpacity style={styles.profileBtn} onPress={() => {}}>
+          <TouchableOpacity style={styles.profileBtn} onPress={() => { }}>
             <ShieldCheck color="#FBBF24" size={24} />
           </TouchableOpacity>
         </View>
@@ -89,57 +89,93 @@ const AdminHomeScreen = ({ navigation }) => {
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Stats Grid */}
           <View style={styles.statsGrid}>
-            <View style={styles.statBox}>
-              <Activity color="#38BDF8" size={20} />
-              <Text style={styles.statValue} allowFontScaling={false}>{stats.users}</Text>
-              <Text style={styles.statTitle} allowFontScaling={false}>Người dùng</Text>
+            <View style={styles.statRow}>
+              <View style={styles.statBox}>
+                <View style={styles.statHeader}>
+                  <Users color="#38BDF8" size={18} />
+                  <View style={styles.todayBadge}>
+                    <Plus color="#38BDF8" size={10} />
+                    <Text style={styles.todayValue}>{formatNumber(stats?.userStats?.today)}</Text>
+                  </View>
+                </View>
+                <Text style={styles.statValue}>{formatNumber(stats?.userStats?.total)}</Text>
+                <Text style={styles.statTitle}>Người dùng</Text>
+              </View>
+
+              <View style={styles.statBox}>
+                <View style={styles.statHeader}>
+                  <Package color="#FBBF24" size={18} />
+                  <View style={styles.todayBadge}>
+                    <Plus color="#FBBF24" size={10} />
+                    <Text style={[styles.todayValue, { color: '#FBBF24' }]}>{formatNumber(stats?.productStats?.today)}</Text>
+                  </View>
+                </View>
+                <Text style={styles.statValue}>{formatNumber(stats?.productStats?.total)}</Text>
+                <Text style={styles.statTitle}>Vật phẩm</Text>
+              </View>
             </View>
-            <View style={styles.statBox}>
-              <ShoppingBag color="#FBBF24" size={20} />
-              <Text style={styles.statValue} allowFontScaling={false}>{stats.posts}</Text>
-              <Text style={styles.statTitle} allowFontScaling={false}>Sản phẩm</Text>
-            </View>
-            <View style={styles.statBox}>
-              <AlertTriangle color="#F43F5E" size={20} />
-              <Text style={styles.statValue} allowFontScaling={false}>{stats.reports}</Text>
-              <Text style={styles.statTitle} allowFontScaling={false}>Báo cáo</Text>
+
+            <View style={styles.statRow}>
+              <View style={styles.statBox}>
+                <View style={styles.statHeader}>
+                  <FileText color="#A855F7" size={18} />
+                  <View style={styles.todayBadge}>
+                    <Plus color="#A855F7" size={10} />
+                    <Text style={[styles.todayValue, { color: '#A855F7' }]}>{formatNumber(stats?.tuViStats?.today)}</Text>
+                  </View>
+                </View>
+                <Text style={styles.statValue}>{formatNumber(stats?.tuViStats?.total)}</Text>
+                <Text style={styles.statTitle}>Lá số</Text>
+              </View>
+
+              <View style={styles.statBox}>
+                <View style={styles.statHeader}>
+                  <MessageSquare color="#10B981" size={18} />
+                  <View style={styles.todayBadge}>
+                    <Plus color="#10B981" size={10} />
+                    <Text style={[styles.todayValue, { color: '#10B981' }]}>{formatNumber(stats?.postStats?.today)}</Text>
+                  </View>
+                </View>
+                <Text style={styles.statValue}>{formatNumber(stats?.postStats?.total)}</Text>
+                <Text style={styles.statTitle}>Bài viết</Text>
+              </View>
             </View>
           </View>
 
           {/* Quick Actions */}
           <View style={styles.section}>
             <Text style={styles.sectionHeader} allowFontScaling={false}>QUẢN LÝ HỆ THỐNG</Text>
-            
-            <ActionCard 
+
+            <ActionCard
               icon={<Users color="#38BDF8" size={24} />}
               label="Danh sách Người dùng"
               description="Quản lý thông tin & quyền truy cập"
               color="#38BDF8"
-              onPress={() => {}}
+              onPress={() => navigation.navigate('UserManagement')}
             />
-            
-            <ActionCard 
+
+            <ActionCard
               icon={<ShoppingBag color="#FBBF24" size={24} />}
               label="Quản lý Cửa hàng"
               description="Quản lý sản phẩm & đơn hàng"
               color="#FBBF24"
-              onPress={() => {}}
+              onPress={() => { }}
             />
-            
-            <ActionCard 
+
+            <ActionCard
               icon={<AlertTriangle color="#F43F5E" size={24} />}
               label="Báo cáo & Vi phạm"
               description="Xử lý khiếu nại & báo cáo nội dung"
               color="#F43F5E"
-              onPress={() => {}}
+              onPress={() => { }}
             />
 
-            <ActionCard 
+            <ActionCard
               icon={<Settings color="#94A3B8" size={24} />}
               label="Cấu hình Hệ thống"
               description="Chỉnh sửa các tham số ứng dụng"
               color="#94A3B8"
-              onPress={() => {}}
+              onPress={() => { }}
             />
           </View>
 
@@ -182,21 +218,55 @@ const styles = StyleSheet.create({
   },
   scrollContent: { paddingHorizontal: 20 },
   statsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 32,
   },
-  statBox: {
-    width: '31%',
-    backgroundColor: '#1E293B60',
-    borderRadius: 20,
-    padding: 16,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#334155',
+  statRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
   },
-  statValue: { color: '#F8FAFC', fontSize: 18, fontWeight: 'bold', marginTop: 10 },
-  statTitle: { color: '#64748B', fontSize: 10, fontWeight: 'bold', marginTop: 4, textTransform: 'uppercase' },
+  statBox: {
+    width: '48.5%',
+    backgroundColor: 'rgba(30, 41, 59, 0.4)',
+    borderRadius: 24,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(51, 65, 85, 0.5)',
+  },
+  statHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  todayBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 0.5,
+    borderColor: 'rgba(51, 65, 85, 0.5)',
+  },
+  todayValue: {
+    color: '#38BDF8',
+    fontSize: 11,
+    fontWeight: '700',
+    marginLeft: 2,
+  },
+  statValue: {
+    color: '#F8FAFC',
+    fontSize: 24,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+  },
+  statTitle: {
+    color: '#64748B',
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 4,
+  },
   section: { marginBottom: 32 },
   sectionHeader: { color: '#334155', fontSize: 13, fontWeight: 'bold', letterSpacing: 1.5, marginBottom: 16, marginLeft: 8 },
   actionCard: {
