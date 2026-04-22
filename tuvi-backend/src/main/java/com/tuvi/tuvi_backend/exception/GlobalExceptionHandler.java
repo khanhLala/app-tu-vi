@@ -69,7 +69,7 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiResponse<?>> handlingHttpMessageNotReadable(org.springframework.http.converter.HttpMessageNotReadableException exception) {
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .code(ErrorCode.INVALID_KEY.getCode())
-                .message("Định dạng dữ liệu không hợp lệ. Vui lòng kiểm tra lại (ví dụ: ngày sinh YYYY-MM-DD)")
+                .message("Định dạng dữ liệu không hợp lệ. Vui lòng kiểm tra lại các trường nhập liệu.")
                 .build();
         return ResponseEntity.badRequest().body(apiResponse);
     }
