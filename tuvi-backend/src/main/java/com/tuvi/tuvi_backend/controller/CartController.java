@@ -47,4 +47,12 @@ public class CartController {
                 .message("Đã xóa khỏi giỏ hàng")
                 .build();
     }
+
+    @PutMapping("/update/{cartItemId}/{quantity}")
+    public ApiResponse<?> updateQuantity(@PathVariable String cartItemId, @PathVariable Integer quantity) {
+        return ApiResponse.<Object>builder()
+                .code(1000)
+                .result(cartService.updateQuantity(getCurrentUserId(), cartItemId, quantity))
+                .build();
+    }
 }

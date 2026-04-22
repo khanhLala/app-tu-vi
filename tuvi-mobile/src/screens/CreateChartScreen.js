@@ -28,9 +28,42 @@ const CreateChartScreen = ({ navigation }) => {
   const [gender, setGender] = useState(1); // 1: Nam, 0: Nữ
   const [isLunar, setIsLunar] = useState(false);
 
-  const handleGenerate = async () => {
+  const validateInput = () => {
     if (!name || !day || !month || !year || !hour) {
-      Alert.alert('Thông báo', 'Vui lòng nhập đầy đủ thông tin để lập lá số.');
+      return 'Vui lòng nhập đầy đủ thông tin để lập lá số.';
+    }
+    
+    const d = parseInt(day);
+    const m = parseInt(month);
+    const y = parseInt(year);
+    const h = parseInt(hour);
+    const min = parseInt(minute || 0);
+
+    // Range checks
+    if (y < 1900 || y > 2100) return 'Năm sinh phải từ 1900 đến 2100.';
+    if (m < 1 || m > 12) return 'Tháng không hợp lệ (1-12).';
+    if (h < 0 || h > 23) return 'Giờ không hợp lệ (0-23).';
+    if (min < 0 || min > 59) return 'Phút không hợp lệ (0-59).';
+
+    if (isLunar) {
+      if (d < 1 || d > 30) return 'Ngày Âm lịch chỉ có từ 1 đến 30.';
+    } else {
+      // Solar logic
+      const isLeap = (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0));
+      const daysInMonth = [31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+      
+      if (d < 1 || d > daysInMonth[m - 1]) {
+        return `Tháng ${m}/${y} chỉ có tối đa ${daysInMonth[m - 1]} ngày.`;
+      }
+    }
+
+    return null;
+  };
+
+  const handleGenerate = async () => {
+    const errorMsg = validateInput();
+    if (errorMsg) {
+      Alert.alert('Thông báo', errorMsg);
       return;
     }
 
@@ -124,6 +157,7 @@ const CreateChartScreen = ({ navigation }) => {
                 placeholder="Ngày"
                 placeholderTextColor="#64748B"
                 keyboardType="numeric"
+                maxLength={2}
                 value={day}
                 onChangeText={setDay}
               />
@@ -132,6 +166,7 @@ const CreateChartScreen = ({ navigation }) => {
                 placeholder="Tháng"
                 placeholderTextColor="#64748B"
                 keyboardType="numeric"
+                maxLength={2}
                 value={month}
                 onChangeText={setMonth}
               />
@@ -140,6 +175,7 @@ const CreateChartScreen = ({ navigation }) => {
                 placeholder="Năm"
                 placeholderTextColor="#64748B"
                 keyboardType="numeric"
+                maxLength={4}
                 value={year}
                 onChangeText={setYear}
               />
@@ -154,6 +190,7 @@ const CreateChartScreen = ({ navigation }) => {
                     placeholder="Giờ"
                     placeholderTextColor="#64748B"
                     keyboardType="numeric"
+                    maxLength={2}
                     value={hour}
                     onChangeText={setHour}
                   />
@@ -163,6 +200,7 @@ const CreateChartScreen = ({ navigation }) => {
                     placeholder="Phút"
                     placeholderTextColor="#64748B"
                     keyboardType="numeric"
+                    maxLength={2}
                     value={minute}
                     onChangeText={setMinute}
                   />
@@ -178,6 +216,7 @@ const CreateChartScreen = ({ navigation }) => {
                   placeholder="2026"
                   placeholderTextColor="#64748B"
                   keyboardType="numeric"
+                  maxLength={4}
                   value={viewYear}
                   onChangeText={setViewYear}
                 />

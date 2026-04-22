@@ -53,6 +53,12 @@ axiosClient.interceptors.response.use((response) => {
 
   // Nếu là lỗi 401 và không phải là yêu cầu refresh chính nó
   if (response && response.status === 401 && !originalRequest._retry) {
+    // Không tự động refresh nếu đang ở màn hình Login/Register
+    const isAuthEndpoint = originalRequest.url.endsWith('/auth/token') || originalRequest.url.endsWith('/users');
+    if (isAuthEndpoint) {
+      return Promise.reject(error.response?.data || error);
+    }
+
     if (originalRequest.url.endsWith('/auth/refresh')) {
       // Nếu chính request refresh cũng lỗi 401 thì logout luôn
       await AsyncStorage.removeItem('token');

@@ -69,7 +69,8 @@ const LoginScreen = ({ navigation }) => {
         }
       }
     } catch (error) {
-      const message = error.message || 'Tên đăng nhập hoặc mật khẩu không đúng.';
+      // Ưu tiên lấy message từ ApiResponse của Backend
+      const message = error.message || error.detail || 'Tên đăng nhập hoặc mật khẩu không chính xác.';
       Alert.alert('Lỗi đăng nhập', message);
     } finally {
       setLoading(false);

@@ -28,8 +28,13 @@ export const CartProvider = ({ children }) => {
     await fetchCart();
   }, [fetchCart]);
 
+  const updateCartQuantity = useCallback(async (cartItemId, quantity) => {
+    await cartApi.updateQuantity(cartItemId, quantity);
+    await fetchCart();
+  }, [fetchCart]);
+
   return (
-    <CartContext.Provider value={{ cartItems, cartCount, fetchCart, addToCart, removeFromCart }}>
+    <CartContext.Provider value={{ cartItems, cartCount, fetchCart, addToCart, removeFromCart, updateCartQuantity }}>
       {children}
     </CartContext.Provider>
   );
