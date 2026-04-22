@@ -79,5 +79,18 @@ public class DataSeeder implements CommandLineRunner {
                 reviewRepository.save(r2);
             }
         }
+
+        // Data Fix: Ensure all products have types based on category if they are null
+        productRepository.findAll().stream()
+            .filter(p -> p.getType() == null)
+            .forEach(p -> {
+                if ("Vật Phẩm Phong Thủy".equals(p.getCategory())) {
+                    p.setType(ProductType.PRODUCT);
+                } else if ("Gói xem lá số".equals(p.getCategory())) {
+                    p.setType(ProductType.SERVICE);
+                }
+                productRepository.save(p);
+            });
     }
 }
+

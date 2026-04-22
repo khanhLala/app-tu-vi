@@ -1,15 +1,19 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Share, TextInput, ActivityIndicator, Alert, Image } from 'react-native';
-import { Heart, MessageCircle, Share2, AlertCircle, Trash2, Send, ChevronRight } from 'lucide-react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Share, TextInput, ActivityIndicator, Alert, Image, Modal } from 'react-native';
+import { Heart, MessageCircle, Share2, AlertCircle, Trash2, Send, ChevronRight, ShieldAlert } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import axiosClient from '../api/axiosClient';
 
 const PostCard = ({ post, onLike, onReport, onDelete, onComment, currentUserId, isAdmin }) => {
   const navigation = useNavigation();
   const [showComments, setShowComments] = React.useState(false);
   const [commentText, setCommentText] = React.useState('');
   const [commenting, setCommenting] = React.useState(false);
+  const [reportModalVisible, setReportModalVisible] = React.useState(false);
+  const [reportReason, setReportReason] = React.useState('');
+  const [reporting, setReporting] = React.useState(false);
 
-  const chartData = post.chartData; // Backend đã parse sẵn JSON
+  const chartData = post.chartData;
   const isAuthor = currentUserId === post.authorId;
   const canDelete = isAuthor || isAdmin;
 
@@ -54,6 +58,24 @@ const PostCard = ({ post, onLike, onReport, onDelete, onComment, currentUserId, 
     }
   };
 
+  const submitReport = async () => {
+    if (!reportReason.trim()) {
+        Alert.alert('Thông báo', 'Bạn cần nhập lý do báo cáo.');
+        return;
+    }
+    setReporting(true);
+    try {
+      await axiosClient.post(`/posts/${post.id}/report`, { reason: reportReason });
+      Alert.alert('Thành công', 'Báo cáo của bạn đã được gửi cho quản trị viên.');
+      setReportModalVisible(false);
+      setReportReason('');
+    } catch (error) {
+      Alert.alert('Lỗi', 'Không thể gửi báo cáo lúc này.');
+    } finally {
+      setReporting(false);
+    }
+  };
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -61,7 +83,7 @@ const PostCard = ({ post, onLike, onReport, onDelete, onComment, currentUserId, 
           {post.authorAvatar ? (
             <Image source={{ uri: post.authorAvatar }} style={styles.avatarImg} />
           ) : (
-            <Text style={styles.avatarText}>{post.authorName.charAt(0)}</Text>
+            <Text style={styles.avatarText}>{post.authorName?.charAt(0)}</Text>
           )}
         </View>
         <View style={{ flex: 1 }}>
@@ -75,7 +97,10 @@ const PostCard = ({ post, onLike, onReport, onDelete, onComment, currentUserId, 
                     <Trash2 color="#EF4444" size={18} />
                 </TouchableOpacity>
             )}
-            <TouchableOpacity style={styles.reportBtn} onPress={onReport}>
+            <TouchableOpacity 
+              style={styles.reportBtn} 
+              onPress={() => setReportModalVisible(true)}
+            >
                 <AlertCircle color="#64748B" size={18} />
                 <Text style={styles.reportText}>Báo cáo</Text>
             </TouchableOpacity>
@@ -85,14 +110,14 @@ const PostCard = ({ post, onLike, onReport, onDelete, onComment, currentUserId, 
       <Text style={styles.content}>{post.content}</Text>
 
       {chartData && (
-    <TouchableOpacity 
+        <TouchableOpacity 
           style={styles.chartMiniBox} 
           onPress={() => navigation.navigate('ChartDetail', { chartData, hidePrivateInfo: true })}
         >
           <View style={{ flex: 1 }}>
-            <Text style={styles.chartTitle}>Lá số đính kèm: {chartData.personal_info.name}</Text>
-            <Text style={styles.chartInfo}>{chartData.personal_info.am_duong_nam_nu}</Text>
-            <Text style={styles.chartInfo}>Mệnh: {chartData.personal_info.menh_palace}</Text>
+            <Text style={styles.chartTitle}>Lá số đính kèm: {chartData.personal_info?.name}</Text>
+            <Text style={styles.chartInfo}>{chartData.personal_info?.am_duong_nam_nu}</Text>
+            <Text style={styles.chartInfo}>Mệnh: {chartData.personal_info?.menh_palace}</Text>
           </View>
           <ChevronRight color="#FBBF24" size={20} />
         </TouchableOpacity>
@@ -146,6 +171,58 @@ const PostCard = ({ post, onLike, onReport, onDelete, onComment, currentUserId, 
           </View>
         </View>
       )}
+
+      {/* Report Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={reportModalVisible}
+        onRequestClose={() => setReportModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <ShieldAlert color="#FBBF24" size={24} />
+              <Text style={styles.modalTitle}>Báo cáo bài viết</Text>
+            </View>
+            
+            <Text style={styles.modalLabel}>Lý do vi phạm:</Text>
+            <TextInput
+              style={styles.reportInput}
+              placeholder="Nhập lý do chi tiết tại đây..."
+              placeholderTextColor="#64748B"
+              multiline
+              numberOfLines={4}
+              value={reportReason}
+              onChangeText={setReportReason}
+            />
+            
+            <View style={styles.modalFooter}>
+              <TouchableOpacity 
+                style={[styles.modalBtn, styles.cancelBtn]} 
+                onPress={() => {
+                  setReportModalVisible(false);
+                  setReportReason('');
+                }}
+              >
+                <Text style={styles.cancelText}>Hủy</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.modalBtn, styles.submitBtn]} 
+                onPress={submitReport}
+                disabled={reporting}
+              >
+                {reporting ? (
+                  <ActivityIndicator color="#0F172A" size="small" />
+                ) : (
+                  <Text style={styles.submitText}>Gửi báo cáo</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -232,6 +309,79 @@ const styles = StyleSheet.create({
     color: '#F8FAFC',
     fontSize: 14,
     marginRight: 10,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(2, 6, 23, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#1E293B',
+    borderRadius: 24,
+    width: '100%',
+    padding: 24,
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    color: '#F8FAFC',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginLeft: 12,
+  },
+  modalLabel: {
+    color: '#94A3B8',
+    fontSize: 14,
+    marginBottom: 8,
+    marginLeft: 4,
+  },
+  reportInput: {
+    backgroundColor: '#0F172A',
+    borderRadius: 12,
+    padding: 16,
+    color: '#F8FAFC',
+    fontSize: 15,
+    minHeight: 100,
+    textAlignVertical: 'top',
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+  modalFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 24,
+  },
+  modalBtn: {
+    flex: 0.48,
+    height: 48,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cancelBtn: {
+    backgroundColor: 'rgba(148, 163, 184, 0.1)',
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+  submitBtn: {
+    backgroundColor: '#FBBF24',
+  },
+  cancelText: {
+    color: '#94A3B8',
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+  submitText: {
+    color: '#0F172A',
+    fontSize: 15,
+    fontWeight: 'bold',
   },
 });
 

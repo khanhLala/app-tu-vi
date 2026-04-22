@@ -5,6 +5,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.tuvi.tuvi_backend.enums.ReportStatus;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -19,7 +21,12 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    ReportStatus status = ReportStatus.PENDING;
+
     @Column(name = "reason")
+
     String reason;
 
     @ManyToOne

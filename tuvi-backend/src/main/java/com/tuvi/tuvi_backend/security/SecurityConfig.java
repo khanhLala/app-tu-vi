@@ -43,8 +43,9 @@ public class SecurityConfig {
 
         httpSecurity.authorizeHttpRequests(request -> request
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v1/users/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
+
                 .requestMatchers(HttpMethod.GET, "/api/v1/reviews/product/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/reviews/eligibility/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
