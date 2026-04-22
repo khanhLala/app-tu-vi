@@ -28,6 +28,23 @@ import OrderHistoryScreen from '../screens/OrderHistoryScreen';
 import VietQRPaymentScreen from '../screens/VietQRPaymentScreen';
 import ReviewScreen from '../screens/ReviewScreen';
 import ChatScreen from '../screens/ChatScreen';
+import AdminHomeScreen from '../screens/AdminHomeScreen';
+import UserManagementScreen from '../screens/UserManagementScreen';
+import UserEditScreen from '../screens/UserEditScreen';
+import PostManagementScreen from '../screens/PostManagementScreen';
+import ReportedPostsScreen from '../screens/ReportedPostsScreen';
+import PostDetailScreen from '../screens/PostDetailScreen';
+import ShopManagementScreen from '../screens/ShopManagementScreen';
+import ProductEditScreen from '../screens/ProductEditScreen';
+import RevenueDetailScreen from '../screens/RevenueDetailScreen';
+import ProductOrdersScreen from '../screens/ProductOrdersScreen';
+import AdminOrderDetailScreen from '../screens/AdminOrderDetailScreen';
+
+
+
+
+
+
 
 
 const Stack = createStackNavigator();
@@ -177,6 +194,23 @@ const AppNavigator = () => {
         <Stack.Screen name="VietQRPayment" component={VietQRPaymentScreen} />
         <Stack.Screen name="Review" component={ReviewScreen} />
         <Stack.Screen name="Chat" component={ChatScreen} />
+        <Stack.Screen name="AdminMain" component={AdminHomeScreen} />
+        <Stack.Screen name="UserManagement" component={UserManagementScreen} />
+        <Stack.Screen name="UserEdit" component={UserEditScreen} />
+        <Stack.Screen name="PostManagement" component={PostManagementScreen} />
+        <Stack.Screen name="ReportedPosts" component={ReportedPostsScreen} />
+        <Stack.Screen name="PostDetail" component={PostDetailScreen} />
+        <Stack.Screen name="ShopManagement" component={ShopManagementScreen} />
+        <Stack.Screen name="ProductEdit" component={ProductEditScreen} />
+        <Stack.Screen name="RevenueDetail" component={RevenueDetailScreen} />
+        <Stack.Screen name="ProductOrders" component={ProductOrdersScreen} />
+        <Stack.Screen name="AdminOrderDetail" component={AdminOrderDetailScreen} />
+
+
+
+
+
+
       </Stack.Navigator>
     </NavigationContainer>
   );

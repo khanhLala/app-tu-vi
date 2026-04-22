@@ -81,9 +81,9 @@ const LoginScreen = ({ navigation }) => {
     <LinearGradient colors={['#0F172A', '#1E293B']} style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.inner}
-      >
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.inner}
+        >
         <View style={styles.header}>
           <Text style={styles.title} allowFontScaling={false}>TỬ VI</Text>
           <Text style={styles.subtitle} allowFontScaling={false}>KIẾN GIẢI VẬN MỆNH - ĐỊNH HƯỚNG TƯƠNG LAI</Text>
@@ -99,6 +99,9 @@ const LoginScreen = ({ navigation }) => {
               value={username}
               onChangeText={setUsername}
               autoCapitalize="none"
+              autoComplete="username"
+              textContentType="username"
+              importantForAutofill="yes"
             />
           </View>
 
@@ -111,7 +114,11 @@ const LoginScreen = ({ navigation }) => {
               secureTextEntry={!showPassword}
               value={password}
               onChangeText={setPassword}
+              autoComplete="password"
+              textContentType="password"
+              importantForAutofill="yes"
             />
+
             <TouchableOpacity 
               onPress={() => setShowPassword(!showPassword)}
               style={styles.eyeBtn}

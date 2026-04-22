@@ -16,6 +16,11 @@ import com.tuvi.tuvi_backend.repository.CommentRepository;
 import com.tuvi.tuvi_backend.repository.LikeRepository;
 import com.tuvi.tuvi_backend.repository.PostRepository;
 import com.tuvi.tuvi_backend.repository.UserRepository;
+import com.tuvi.tuvi_backend.repository.ReportRepository;
+import com.tuvi.tuvi_backend.entity.Report;
+import com.tuvi.tuvi_backend.enums.ReportStatus;
+import com.tuvi.tuvi_backend.dto.request.ReportRequest;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -38,7 +43,9 @@ public class PostService {
     UserRepository userRepository;
     LikeRepository likeRepository;
     CommentRepository commentRepository;
+    ReportRepository reportRepository;
     ObjectMapper objectMapper;
+
 
     public PostResponse createPost(PostRequest request) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -154,4 +161,39 @@ public class PostService {
                         .collect(Collectors.toList()))
                 .build();
     }
+
+    public PostResponse getPostById(String postId) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByUsername(username).orElse(null);
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXISTED));
+
+        return mapToPostResponse(post, currentUser);
+    }
+
+    public void reportPost(String postId, ReportRequest request) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User reporter = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXISTED));
+
+        Report report = Report.builder()
+                .post(post)
+                .reporter(reporter)
+                .reason(request.getReason())
+                .status(ReportStatus.PENDING)
+                .build();
+
+        reportRepository.save(report);
+    }
+
+    public List<PostResponse> getAllPosts() {
+        return postRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(post -> mapToPostResponse(post, null))
+                .collect(Collectors.toList());
+    }
 }
+

@@ -1,6 +1,8 @@
 package com.tuvi.tuvi_backend.entity;
 
+import com.tuvi.tuvi_backend.enums.OrderStatus;
 import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -36,10 +38,13 @@ public class Order {
     @Column(name = "payment_method", nullable = false)
     String paymentMethod;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    String status;
+    OrderStatus status;
 
-    @Column(name = "created_at")
+
+    @org.hibernate.annotations.CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
@@ -48,9 +53,10 @@ public class Order {
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
         if (status == null) {
-            status = "PENDING";
+            status = OrderStatus.PENDING;
         }
     }
 }
+
+

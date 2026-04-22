@@ -3,7 +3,9 @@ package com.tuvi.tuvi_backend.service;
 import com.tuvi.tuvi_backend.dto.request.OrderRequest;
 import com.tuvi.tuvi_backend.dto.response.OrderResponse;
 import com.tuvi.tuvi_backend.entity.*;
+import com.tuvi.tuvi_backend.enums.OrderStatus;
 import com.tuvi.tuvi_backend.repository.*;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -62,8 +64,9 @@ public class OrderService {
                 .phone(request.getPhone())
                 .paymentMethod(request.getPaymentMethod())
                 .totalPrice(totalPrice)
-                .status("PENDING")
+                .status(OrderStatus.PENDING)
                 .build();
+
 
         Order savedOrder = orderRepository.save(order);
 
@@ -125,11 +128,13 @@ public class OrderService {
             throw new RuntimeException("You don't have permission to cancel this order");
         }
 
-        if (!"PENDING".equals(order.getStatus()) && !"PAID".equals(order.getStatus())) {
+        if (order.getStatus() != OrderStatus.PENDING) {
+
             throw new RuntimeException("Order cannot be cancelled in current status: " + order.getStatus());
         }
 
-        order.setStatus("CANCELLED");
+        order.setStatus(OrderStatus.CANCELLED);
+
         orderRepository.save(order);
         return mapToOrderResponse(order, order.getItems(), null);
     }
@@ -148,11 +153,12 @@ public class OrderService {
         }
 
         // For testing, we allow completing from PENDING, PAID or SHIPPING
-        if ("CANCELLED".equals(order.getStatus()) || "COMPLETED".equals(order.getStatus())) {
+        if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.COMPLETED) {
             throw new RuntimeException("Order is already " + order.getStatus());
         }
 
-        order.setStatus("COMPLETED");
+        order.setStatus(OrderStatus.COMPLETED);
+
         orderRepository.save(order);
         return mapToOrderResponse(order, order.getItems(), null);
     }

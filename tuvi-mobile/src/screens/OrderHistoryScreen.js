@@ -42,8 +42,9 @@ const OrderHistoryScreen = ({ navigation }) => {
   const filteredOrders = useMemo(() => {
     if (selectedTab === 'ALL') return orders;
     if (selectedTab === 'PENDING') {
-      return orders.filter(o => o.status === 'PENDING' || o.status === 'PAID');
+      return orders.filter(o => o.status === 'PENDING');
     }
+
     return orders.filter(o => o.status === selectedTab);
   }, [orders, selectedTab]);
 
@@ -95,7 +96,7 @@ const OrderHistoryScreen = ({ navigation }) => {
   const getStatusInfo = (status) => {
     switch (status) {
       case 'PENDING': return { label: 'Chờ xác nhận', color: '#FBBF24', icon: <Clock size={14} color="#FBBF24" /> };
-      case 'PAID': return { label: 'Đã thanh toán', color: '#10B981', icon: <CreditCard size={14} color="#10B981" /> };
+
       case 'SHIPPING': return { label: 'Đang giao hàng', color: '#3B82F6', icon: <Truck size={14} color="#3B82F6" /> };
       case 'COMPLETED': return { label: 'Đã hoàn thành', color: '#10B981', icon: <CheckCircle2 size={14} color="#10B981" /> };
       case 'CANCELLED': return { label: 'Đã hủy', color: '#EF4444', icon: <XCircle size={14} color="#EF4444" /> };
@@ -106,7 +107,8 @@ const OrderHistoryScreen = ({ navigation }) => {
   const renderOrderItem = ({ item }) => {
     const statusInfo = getStatusInfo(item.status);
     const date = new Date(item.createdAt).toLocaleDateString('vi-VN');
-    const canCancel = item.status === 'PENDING' || item.status === 'PAID';
+    const canCancel = item.status === 'PENDING';
+
 
     return (
       <View style={styles.orderCard}>

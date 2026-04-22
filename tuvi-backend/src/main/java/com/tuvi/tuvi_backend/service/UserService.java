@@ -117,4 +117,48 @@ public class UserService {
         userResponse.setRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
         return userResponse;
     }
+
+    public java.util.List<UserResponse> getUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> {
+                    UserResponse response = userMapper.toUserResponse(user);
+                    response.setRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
+                    return response;
+                }).collect(Collectors.toList());
+    }
+
+    public UserResponse getUser(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        UserResponse response = userMapper.toUserResponse(user);
+        response.setRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
+        return response;
+    }
+
+    public UserResponse updateUser(String id, UserUpdateRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setDob(request.getDob());
+        user.setPhone(request.getPhone());
+        user.setEmail(request.getEmail());
+        user.setAddress(request.getAddress());
+
+        if (request.getRoles() != null) {
+            var roles = roleRepository.findAllById(request.getRoles());
+            user.setRoles(new HashSet<>(roles));
+        }
+
+        User savedUser = userRepository.save(user);
+        UserResponse response = userMapper.toUserResponse(savedUser);
+        response.setRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
+        return response;
+    }
+
+    public void deleteUser(String id) {
+        userRepository.deleteById(id);
+    }
 }
+
