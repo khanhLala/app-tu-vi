@@ -42,25 +42,43 @@ const LoginScreen = ({ navigation }) => {
       });
       
       if (result && result.token) {
+        console.log('Login successful, token received. Saving to AsyncStorage...');
         await AsyncStorage.setItem('token', result.token);
         
         // Kiểm tra quyền ngay sau khi login
         try {
           const profile = await axiosClient.get('/users/my-info');
+          console.log('Profile fetched:', profile);
           const isAdmin = profile?.roles?.includes('ADMIN');
           
           if (isAdmin) {
-            Alert.alert(
-              'Thành công', 
-              'Chào mừng bạn quay trở lại trang quản trị!',
-              [{ text: 'Vào Dashboard', onPress: () => navigation.replace('AdminMain') }]
-            );
+            if (Platform.OS === 'web') {
+              console.log('Web detected, navigating immediately to AdminMain...');
+              navigation.replace('AdminMain');
+            } else {
+              Alert.alert(
+                'Thành công', 
+                'Chào mừng bạn quay trở lại trang quản trị!',
+                [{ text: 'Vào Dashboard', onPress: () => {
+                  console.log('Navigating to AdminMain...');
+                  navigation.replace('AdminMain');
+                }}]
+              );
+            }
           } else {
-            Alert.alert(
-              'Thành công', 
-              'Chào mừng bạn đến với Tử Vi App!',
-              [{ text: 'Bắt đầu', onPress: () => navigation.replace('Main') }]
-            );
+            if (Platform.OS === 'web') {
+              console.log('Web detected, navigating immediately to Main...');
+              navigation.replace('Main');
+            } else {
+              Alert.alert(
+                'Thành công', 
+                'Chào mừng bạn đến với Tử Vi App!',
+                [{ text: 'Bắt đầu', onPress: () => {
+                  console.log('Navigating to Main...');
+                  navigation.replace('Main');
+                }}]
+              );
+            }
           }
         } catch (infoError) {
           console.log('Error fetching role after login:', infoError);
@@ -201,11 +219,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 24,
-    shadowColor: '#FBBF24',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
   },
   loginText: {
     color: '#0F172A',

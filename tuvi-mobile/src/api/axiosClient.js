@@ -24,11 +24,18 @@ const onRefreshed = (token) => {
 
 // Interceptor để tự động gắn Token vào Headers
 axiosClient.interceptors.request.use(async (config) => {
-  // Không gắn token cho các endpoint công khai (Login, Register)
-  const publicEndpoints = ['/auth/token', '/users'];
-  const isPublicEndpoint = publicEndpoints.some(endpoint => config.url.endsWith(endpoint));
+  // Chuẩn hóa URL để kiểm tra (bỏ baseURL nếu có)
+  const url = config.url || '';
+  const publicEndpoints = ['/auth/token', '/auth/introspect', '/users'];
+  
+  // Kiểm tra xem có phải endpoint công khai không
+  const isPublicEndpoint = publicEndpoints.some(endpoint => 
+    url === endpoint || url.endsWith(endpoint)
+  );
 
-  if (isPublicEndpoint && config.method === 'post') {
+  // Nếu là POST vào endpoint công khai thì không gửi token
+  if (isPublicEndpoint && config.method?.toLowerCase() === 'post') {
+    console.log(`[Request] Public endpoint detected: ${url}, skipping token.`);
     return config;
   }
 
@@ -43,18 +50,26 @@ axiosClient.interceptors.request.use(async (config) => {
 
 // Interceptor để xử lý lỗi tập trung từ ApiResponse của Spring Boot và Silent Refresh
 axiosClient.interceptors.response.use((response) => {
-  if (response.data && response.data.code === 1000) {
-    return response.data.result;
+  if (response.data) {
+    if (response.data.code === 1000) {
+      return response.data.result;
+    } else {
+      // Nếu có code khác 1000 thì coi như lỗi và reject
+      return Promise.reject(response.data);
+    }
   }
   return response;
 }, async (error) => {
   const { config, response } = error;
   const originalRequest = config;
 
-  // Nếu là lỗi 401 và không phải là yêu cầu refresh chính nó
-  if (response && response.status === 401 && !originalRequest._retry) {
+  // Nếu là lỗi 401 và không phải là yêu cầu refresh chính nó hoặc yêu cầu login
+  const isAuthRequest = originalRequest.url.endsWith('/auth/token') || originalRequest.url.endsWith('/auth/refresh');
+
+  if (response && response.status === 401 && !isAuthRequest && !originalRequest._retry) {
     if (originalRequest.url.endsWith('/auth/refresh')) {
       // Nếu chính request refresh cũng lỗi 401 thì logout luôn
+      console.log('[Response] Refresh token failed with 401, logging out.');
       await AsyncStorage.removeItem('token');
       return Promise.reject(error);
     }

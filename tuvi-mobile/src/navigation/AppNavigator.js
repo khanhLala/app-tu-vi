@@ -28,6 +28,7 @@ import OrderHistoryScreen from '../screens/OrderHistoryScreen';
 import VietQRPaymentScreen from '../screens/VietQRPaymentScreen';
 import ReviewScreen from '../screens/ReviewScreen';
 import ChatScreen from '../screens/ChatScreen';
+import AdminHomeScreen from '../screens/AdminHomeScreen';
 
 
 const Stack = createStackNavigator();
@@ -160,6 +161,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
+        <Stack.Screen name="AdminMain" component={AdminHomeScreen} />
         <Stack.Screen name="History" component={ProfileListScreen} />
 
         <Stack.Screen name="ChartDetail" component={ChartDetailScreen} />
