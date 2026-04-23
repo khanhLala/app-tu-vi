@@ -62,16 +62,16 @@ const ReportedPostsScreen = ({ navigation }) => {
 
   const handleDismissReport = (reportId) => {
     Alert.alert(
-      'Bỏ qua báo cáo',
-      'Bạn có chắc chắn muốn bỏ qua báo cáo này? Bài viết vẫn sẽ được giữ lại.',
+      'Không xử lý báo cáo',
+      'Bạn có chắc chắn muốn giữ lại bài viết này và không xử lý báo cáo?',
       [
         { text: 'Hủy', style: 'cancel' },
         { 
-          text: 'Bỏ qua', 
+          text: 'Xác nhận', 
           onPress: async () => {
             try {
               await axiosClient.put(`/reports/${reportId}/status`, null, { params: { status: 'DISMISSED' } });
-              Alert.alert('Thành công', 'Báo cáo đã được bỏ qua.');
+              Alert.alert('Thành công', 'Báo cáo đã được chuyển sang trạng thái không xử lý.');
               fetchReports(activeTab);
             } catch (error) {
               Alert.alert('Lỗi', 'Không thể cập nhật trạng thái báo cáo.');
@@ -89,9 +89,23 @@ const ReportedPostsScreen = ({ navigation }) => {
     >
       <View style={styles.reportHeader}>
         <View style={styles.statusBadge}>
-          <AlertTriangle color={item.status === 'PENDING' ? '#FBBF24' : '#94A3B8'} size={14} />
-          <Text style={[styles.statusText, { color: item.status === 'PENDING' ? '#FBBF24' : '#94A3B8' }]}>
-            {item.status === 'PENDING' ? 'Đang chờ' : item.status === 'RESOLVED' ? 'Đã xóa' : 'Đã bỏ qua'}
+          <AlertTriangle 
+            color={
+              item.status === 'PENDING' ? '#FBBF24' : 
+              item.status === 'RESOLVED' ? '#EF4444' : 
+              '#94A3B8'
+            } 
+            size={14} 
+          />
+          <Text style={[
+            styles.statusText, 
+            { 
+              color: item.status === 'PENDING' ? '#FBBF24' : 
+                     item.status === 'RESOLVED' ? '#EF4444' : 
+                     '#94A3B8' 
+            }
+          ]}>
+            {item.status === 'PENDING' ? 'Đang chờ' : item.status === 'RESOLVED' ? 'Đã xóa' : 'Không xử lý'}
           </Text>
         </View>
         <Text style={styles.dateText}>{new Date(item.createdAt).toLocaleDateString()}</Text>

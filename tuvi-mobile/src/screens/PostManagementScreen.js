@@ -177,9 +177,23 @@ const PostManagementScreen = ({ navigation, route }) => {
     >
       <View style={styles.cardHeader}>
         <View style={styles.statusBadge}>
-          <AlertTriangle color={item.status === 'PENDING' ? '#FBBF24' : '#94A3B8'} size={14} />
-          <Text style={[styles.statusText, { color: item.status === 'PENDING' ? '#FBBF24' : '#94A3B8' }]}>
-            {item.status === 'PENDING' ? 'Đang chờ' : item.status === 'RESOLVED' ? 'Đã xóa' : 'Đã bỏ qua'}
+          <AlertTriangle 
+            color={
+              item.status === 'PENDING' ? '#FBBF24' : 
+              item.status === 'RESOLVED' ? '#EF4444' : 
+              '#94A3B8'
+            } 
+            size={14} 
+          />
+          <Text style={[
+            styles.statusText, 
+            { 
+              color: item.status === 'PENDING' ? '#FBBF24' : 
+                     item.status === 'RESOLVED' ? '#EF4444' : 
+                     '#94A3B8' 
+            }
+          ]}>
+            {item.status === 'PENDING' ? 'Đang chờ' : item.status === 'RESOLVED' ? 'Đã xóa' : 'Không xử lý'}
           </Text>
         </View>
         <Text style={styles.dateText}>{new Date(item.createdAt).toLocaleDateString()}</Text>

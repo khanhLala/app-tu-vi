@@ -40,6 +40,7 @@ import ProductEditScreen from '../screens/ProductEditScreen';
 import RevenueDetailScreen from '../screens/RevenueDetailScreen';
 import ProductOrdersScreen from '../screens/ProductOrdersScreen';
 import AdminOrderDetailScreen from '../screens/AdminOrderDetailScreen';
+import OrderDetailScreen from '../screens/OrderDetailScreen';
 import NotificationScreen from '../screens/NotificationScreen';
 
 
@@ -209,6 +210,7 @@ const AppNavigator = () => {
         <Stack.Screen name="RevenueDetail" component={RevenueDetailScreen} />
         <Stack.Screen name="ProductOrders" component={ProductOrdersScreen} />
         <Stack.Screen name="AdminOrderDetail" component={AdminOrderDetailScreen} />
+        <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
 
 
 

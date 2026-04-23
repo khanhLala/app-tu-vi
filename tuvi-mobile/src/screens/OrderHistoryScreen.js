@@ -71,28 +71,6 @@ const OrderHistoryScreen = ({ navigation }) => {
     );
   };
 
-  const handleCompleteOrder = (orderId) => {
-    Alert.alert(
-      'Xác nhận đã nhận hàng',
-      'Xác nhận bạn đã nhận được gói hàng này?',
-      [
-        { text: 'Hủy', style: 'cancel' },
-        { 
-          text: 'Xác nhận', 
-          onPress: async () => {
-            try {
-              await orderApi.completeOrder(orderId);
-              Alert.alert('Thành công', 'Đơn hàng đã được hoàn thành. Bạn có thể đánh giá sản phẩm ngay bây giờ.');
-              fetchOrders();
-            } catch (e) {
-              Alert.alert('Lỗi', e.message || 'Không thể cập nhật đơn hàng.');
-            }
-          }
-        }
-      ]
-    );
-  };
-
   const getStatusInfo = (status) => {
     switch (status) {
       case 'PENDING': return { label: 'Chờ xác nhận', color: '#FBBF24', icon: <Clock size={14} color="#FBBF24" /> };
@@ -173,23 +151,20 @@ const OrderHistoryScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.cardFooter}>
-          {canCancel && (
-            <TouchableOpacity 
-              style={styles.cancelBtn}
-              onPress={() => handleCancelOrder(item.id)}
-            >
-              <Text style={styles.cancelBtnText}>Hủy đơn</Text>
-            </TouchableOpacity>
-          )}
-          {item.status !== 'COMPLETED' && item.status !== 'CANCELLED' && (
-            <TouchableOpacity 
-              style={styles.completeBtn}
-              onPress={() => handleCompleteOrder(item.id)}
-            >
-              <Text style={styles.completeBtnText}>Đã nhận hàng</Text>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity style={styles.detailBtn}>
+          <View style={{ flex: 1 }}>
+            {canCancel && (
+              <TouchableOpacity 
+                style={styles.cancelBtn}
+                onPress={() => handleCancelOrder(item.id)}
+              >
+                <Text style={styles.cancelBtnText}>Hủy đơn</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          <TouchableOpacity 
+            style={styles.detailBtn}
+            onPress={() => navigation.navigate('OrderDetail', { order: item })}
+          >
             <Text style={styles.detailBtnText}>Chi tiết đơn</Text>
             <ChevronRight size={16} color="#FBBF24" />
           </TouchableOpacity>
@@ -298,13 +273,11 @@ const styles = StyleSheet.create({
   totalLabel: { color: '#F8FAFC', fontSize: 14 },
   totalValue: { color: '#FBBF24', fontSize: 16, fontWeight: 'bold' },
   cardFooter: {
-    flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center',
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     padding: 12, backgroundColor: 'rgba(15, 23, 42, 0.5)', gap: 12,
   },
-  cancelBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: '#EF4444' },
+  cancelBtn: { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: '#EF4444' },
   cancelBtnText: { color: '#EF4444', fontSize: 13, fontWeight: '500' },
-  completeBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: '#10B981' },
-  completeBtnText: { color: '#0F172A', fontSize: 13, fontWeight: '600' },
   detailBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   detailBtnText: { color: '#FBBF24', fontSize: 13, fontWeight: '500' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
