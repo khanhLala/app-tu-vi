@@ -1,6 +1,7 @@
 package com.tuvi.tuvi_backend.dto.request;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -17,7 +18,7 @@ public class UserUpdateRequest {
     String lastName;
     LocalDate dob;
     
-    @Size(min = 10, max = 15, message = "Số điện thoại không hợp lệ")
+    @Pattern(regexp = "^$|[0-9]{10,15}", message = "PHONE_INVALID")
     String phone;
     
     @Email(message = "EMAIL_INVALID")

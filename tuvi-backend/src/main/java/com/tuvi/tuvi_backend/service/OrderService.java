@@ -161,9 +161,9 @@ public class OrderService {
             throw new RuntimeException("You don't have permission to complete this order");
         }
 
-        // For testing, we allow completing from PENDING, PAID or SHIPPING
-        if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.COMPLETED) {
-            throw new RuntimeException("Order is already " + order.getStatus());
+        // User can only mark as COMPLETED (Received) if status is DELIVERED (Delivered by Admin)
+        if (order.getStatus() != OrderStatus.DELIVERED) {
+            throw new RuntimeException("Bạn chỉ có thể xác nhận đã nhận hàng sau khi đơn hàng đã được giao thành công.");
         }
 
         order.setStatus(OrderStatus.COMPLETED);
