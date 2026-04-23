@@ -71,6 +71,28 @@ const OrderHistoryScreen = ({ navigation }) => {
     );
   };
 
+  const handleCompleteOrder = (orderId) => {
+    Alert.alert(
+      'Xác nhận đã nhận hàng',
+      'Xác nhận bạn đã nhận được gói hàng này?',
+      [
+        { text: 'Hủy', style: 'cancel' },
+        { 
+          text: 'Xác nhận', 
+          onPress: async () => {
+            try {
+              await orderApi.completeOrder(orderId);
+              Alert.alert('Thành công', 'Đơn hàng đã được hoàn thành. Bạn có thể đánh giá sản phẩm ngay bây giờ.');
+              fetchOrders();
+            } catch (e) {
+              Alert.alert('Lỗi', e.message || 'Không thể cập nhật đơn hàng.');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const getStatusInfo = (status) => {
     switch (status) {
       case 'PENDING': return { label: 'Chờ xác nhận', color: '#FBBF24', icon: <Clock size={14} color="#FBBF24" /> };
@@ -158,6 +180,14 @@ const OrderHistoryScreen = ({ navigation }) => {
                 onPress={() => handleCancelOrder(item.id)}
               >
                 <Text style={styles.cancelBtnText}>Hủy đơn</Text>
+              </TouchableOpacity>
+            )}
+            {item.status !== 'COMPLETED' && item.status !== 'CANCELLED' && (
+              <TouchableOpacity 
+                style={styles.completeBtn}
+                onPress={() => handleCompleteOrder(item.id)}
+              >
+                <Text style={styles.completeBtnText}>Đã nhận hàng</Text>
               </TouchableOpacity>
             )}
           </View>
