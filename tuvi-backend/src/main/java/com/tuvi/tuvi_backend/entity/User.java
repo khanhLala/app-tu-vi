@@ -67,5 +67,9 @@ public class User {
     @CreationTimestamp
     @Column(name = "created_at")
     java.time.LocalDateTime createdAt;
+
+    @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
+    boolean isDeleted = false;
 }
 
