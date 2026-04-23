@@ -111,6 +111,13 @@ const CheckoutScreen = ({ navigation }) => {
       return;
     }
 
+    // Phone number validation (Vietnam format)
+    const phoneRegex = /^(0|84)(3|5|7|8|9)[0-9]{8}$/;
+    if (!phoneRegex.test(phone.trim().replace(/\s/g, ''))) {
+      Alert.alert('Số điện thoại không hợp lệ', 'Vui lòng nhập số điện thoại hợp lệ');
+      return;
+    }
+
     setLoading(true);
     try {
       const result = await orderApi.createOrder({
