@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, String> {
+    java.util.List<Product> findAllByIsDeletedFalse();
+    java.util.Optional<Product> findByIdAndIsDeletedFalse(String id);
 }

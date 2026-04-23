@@ -25,14 +25,14 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll().stream()
+        return productRepository.findAllByIsDeletedFalse().stream()
                 .map(this::mapToProductResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public ProductResponse getProductById(String id) {
-        Product product = productRepository.findById(id)
+        Product product = productRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         return mapToProductResponse(product);
     }
@@ -72,7 +72,10 @@ public class ProductService {
     }
 
     public void deleteProduct(String id) {
-        productRepository.deleteById(id);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        product.setDeleted(true);
+        productRepository.save(product);
     }
 
 

@@ -64,6 +64,10 @@ public class AuthenticationService {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
+        if (user.isDeleted()) {
+            throw new AppException(ErrorCode.USER_DELETED);
+        }
+
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
         if (!authenticated) {
