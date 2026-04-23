@@ -12,7 +12,7 @@ const STATUS_TABS = [
   { id: 'ALL', label: 'Tất cả' },
   { id: 'PENDING', label: 'Chưa xác nhận' },
   { id: 'SHIPPING', label: 'Đang giao' },
-  { id: 'COMPLETED', label: 'Đã nhận' },
+  { id: 'COMPLETED', label: 'Giao/Nhận' },
   { id: 'CANCELLED', label: 'Đã hủy' },
 ];
 
@@ -45,6 +45,10 @@ const OrderHistoryScreen = ({ navigation }) => {
       return orders.filter(o => o.status === 'PENDING');
     }
 
+    if (selectedTab === 'COMPLETED') {
+      return orders.filter(o => o.status === 'DELIVERED' || o.status === 'COMPLETED');
+    }
+
     return orders.filter(o => o.status === selectedTab);
   }, [orders, selectedTab]);
 
@@ -71,12 +75,35 @@ const OrderHistoryScreen = ({ navigation }) => {
     );
   };
 
+  const handleCompleteOrder = (orderId) => {
+    Alert.alert(
+      'Xác nhận đã nhận hàng',
+      'Xác nhận bạn đã nhận được gói hàng này?',
+      [
+        { text: 'Hủy', style: 'cancel' },
+        { 
+          text: 'Xác nhận', 
+          onPress: async () => {
+            try {
+              await orderApi.completeOrder(orderId);
+              Alert.alert('Thành công', 'Đơn hàng đã được hoàn thành. Bạn có thể đánh giá sản phẩm ngay bây giờ.');
+              fetchOrders();
+            } catch (e) {
+              Alert.alert('Lỗi', e.message || 'Không thể cập nhật đơn hàng.');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const getStatusInfo = (status) => {
     switch (status) {
       case 'PENDING': return { label: 'Chờ xác nhận', color: '#FBBF24', icon: <Clock size={14} color="#FBBF24" /> };
 
-      case 'SHIPPING': return { label: 'Đang giao hàng', color: '#3B82F6', icon: <Truck size={14} color="#3B82F6" /> };
-      case 'COMPLETED': return { label: 'Đã hoàn thành', color: '#10B981', icon: <CheckCircle2 size={14} color="#10B981" /> };
+      case 'SHIPPING': return { label: 'Đang vận chuyển', color: '#3B82F6', icon: <Truck size={14} color="#3B82F6" /> };
+      case 'DELIVERED': return { label: 'Đã giao hàng', color: '#8B5CF6', icon: <CheckCircle2 size={14} color="#8B5CF6" /> };
+      case 'COMPLETED': return { label: 'Đã nhận hàng', color: '#10B981', icon: <CheckCircle2 size={14} color="#10B981" /> };
       case 'CANCELLED': return { label: 'Đã hủy', color: '#EF4444', icon: <XCircle size={14} color="#EF4444" /> };
       default: return { label: status, color: '#94A3B8', icon: <Box size={14} color="#94A3B8" /> };
     }
@@ -158,6 +185,14 @@ const OrderHistoryScreen = ({ navigation }) => {
                 onPress={() => handleCancelOrder(item.id)}
               >
                 <Text style={styles.cancelBtnText}>Hủy đơn</Text>
+              </TouchableOpacity>
+            )}
+            {item.status === 'DELIVERED' && (
+              <TouchableOpacity 
+                style={styles.completeBtn}
+                onPress={() => handleCompleteOrder(item.id)}
+              >
+                <Text style={styles.completeBtnText}>Xác nhận đã nhận</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -278,6 +313,8 @@ const styles = StyleSheet.create({
   },
   cancelBtn: { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: '#EF4444' },
   cancelBtnText: { color: '#EF4444', fontSize: 13, fontWeight: '500' },
+  completeBtn: { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: '#10B981' },
+  completeBtnText: { color: '#0F172A', fontSize: 13, fontWeight: '600' },
   detailBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   detailBtnText: { color: '#FBBF24', fontSize: 13, fontWeight: '500' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },

@@ -36,8 +36,9 @@ const { width } = Dimensions.get('window');
 
 const ORDER_STATUSES = [
   { id: 'PENDING', label: 'Chờ xác nhận', icon: Clock, color: '#FBBF24' },
-  { id: 'SHIPPING', label: 'Đang giao', icon: Truck, color: '#818CF8' },
-  { id: 'COMPLETED', label: 'Đã giao', icon: CheckCircle2, color: '#10B981' },
+  { id: 'SHIPPING', label: 'Đang vận chuyển', icon: Truck, color: '#818CF8' },
+  { id: 'DELIVERED', label: 'Đã giao hàng', icon: CheckCircle2, color: '#8B5CF6' },
+  { id: 'COMPLETED', label: 'Đã nhận hàng', icon: CheckCircle2, color: '#10B981' },
   { id: 'CANCELLED', label: 'Đã hủy', icon: XCircle, color: '#F43F5E' },
 ];
 

@@ -41,8 +41,9 @@ const AdminOrderDetailScreen = ({ navigation, route }) => {
   const getStatusInfo = (status) => {
     switch (status) {
       case 'PENDING': return { label: 'Chờ xác nhận', color: '#FBBF24', icon: <Clock color="#FBBF24" size={20} /> };
-      case 'SHIPPING': return { label: 'Đang giao hàng', color: '#818CF8', icon: <Truck color="#818CF8" size={20} /> };
-      case 'COMPLETED': return { label: 'Đã giao', color: '#10B981', icon: <CheckCircle2 color="#10B981" size={20} /> };
+      case 'SHIPPING': return { label: 'Đang vận chuyển', color: '#818CF8', icon: <Truck color="#818CF8" size={20} /> };
+      case 'DELIVERED': return { label: 'Đã giao hàng', color: '#8B5CF6', icon: <CheckCircle2 color="#8B5CF6" size={20} /> };
+      case 'COMPLETED': return { label: 'Đã nhận hàng', color: '#10B981', icon: <CheckCircle2 color="#10B981" size={20} /> };
       case 'CANCELLED': return { label: 'Đã hủy đơn', color: '#F43F5E', icon: <XCircle color="#F43F5E" size={20} /> };
       default: return { label: status, color: '#64748B', icon: <Package color="#64748B" size={20} /> };
     }
@@ -215,10 +216,10 @@ const AdminOrderDetailScreen = ({ navigation, route }) => {
                   </TouchableOpacity>
                   <TouchableOpacity 
                     style={[styles.actionBtn, styles.completeBtn]} 
-                    onPress={() => handleUpdateStatus('COMPLETED', 'Giao hàng thành công', 'Xác nhận đơn hàng đã được giao thành công?')}
+                    onPress={() => handleUpdateStatus('DELIVERED', 'Giao hàng thành công', 'Xác nhận đơn hàng đã được giao thành công?')}
                   >
                     <Package color="#0F172A" size={20} />
-                    <Text style={styles.completeBtnText}>Đã giao hàng</Text>
+                    <Text style={styles.completeBtnText}>Xác nhận đã giao</Text>
                   </TouchableOpacity>
                 </>
               )}
