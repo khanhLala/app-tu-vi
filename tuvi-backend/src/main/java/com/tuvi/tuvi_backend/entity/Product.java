@@ -43,5 +43,9 @@ public class Product {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     LocalDateTime createdAt;
+
+    @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
+    boolean isDeleted = false;
 }
 

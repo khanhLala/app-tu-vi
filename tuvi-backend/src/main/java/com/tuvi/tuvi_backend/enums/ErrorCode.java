@@ -23,6 +23,7 @@ public enum ErrorCode {
     POST_NOT_EXISTED(1011, "Bài viết không tồn tại", HttpStatus.NOT_FOUND),
     CANNOT_REPORT_OWN_POST(1012, "Bạn không thể tự báo cáo bài viết của mình", HttpStatus.BAD_REQUEST),
     PHONE_INVALID(1013, "Số điện thoại phải chứa từ 10 đến 15 ký tự", HttpStatus.BAD_REQUEST),
+    USER_DELETED(1014, "Tài khoản của bạn đã bị xóa hoặc bị khóa", HttpStatus.BAD_REQUEST),
     ;
 
 

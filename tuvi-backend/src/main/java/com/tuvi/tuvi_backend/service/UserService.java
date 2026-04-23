@@ -119,7 +119,7 @@ public class UserService {
     }
 
     public java.util.List<UserResponse> getUsers() {
-        return userRepository.findAll().stream()
+        return userRepository.findAllByIsDeletedFalse().stream()
                 .map(user -> {
                     UserResponse response = userMapper.toUserResponse(user);
                     response.setRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
@@ -158,7 +158,10 @@ public class UserService {
     }
 
     public void deleteUser(String id) {
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setDeleted(true);
+        userRepository.save(user);
     }
 
     public void toggleNotifications(boolean enabled) {
