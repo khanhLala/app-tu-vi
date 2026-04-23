@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { 
   StyleSheet, 
   View, 
@@ -20,7 +21,8 @@ import {
   Shield, 
   ShieldAlert,
   Trash2,
-  ArrowLeft
+  ArrowLeft,
+  UserPlus
 } from 'lucide-react-native';
 import axiosClient from '../api/axiosClient';
 
@@ -45,9 +47,13 @@ const UserManagementScreen = ({ navigation }) => {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  // useFocusEffect: tự động reload mỗi khi màn hình được focus lại
+  // (ví dụ: sau khi sửa user và quay lại, danh sách sẽ hiển thị thông tin mới nhất)
+  useFocusEffect(
+    useCallback(() => {
+      fetchUsers();
+    }, [])
+  );
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -142,7 +148,12 @@ const UserManagementScreen = ({ navigation }) => {
             <ArrowLeft color="#F8FAFC" size={24} />
           </TouchableOpacity>
           <Text style={styles.headerTitle} allowFontScaling={false}>Quản lý Người dùng</Text>
-          <View style={{ width: 40 }} />
+          <TouchableOpacity
+            style={styles.addBtn}
+            onPress={() => navigation.navigate('UserCreate')}
+          >
+            <UserPlus color="#0F172A" size={20} />
+          </TouchableOpacity>
         </View>
 
         {/* Search Bar */}
@@ -201,6 +212,14 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: 'rgba(30, 41, 59, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FBBF24',
     justifyContent: 'center',
     alignItems: 'center',
   },

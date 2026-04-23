@@ -27,6 +27,27 @@ import {
 } from 'lucide-react-native';
 import axiosClient from '../api/axiosClient';
 
+// Định nghĩa bên ngoài component để tránh re-create mỗi lần render
+// (nếu để bên trong, mỗi lần gõ keyboard sẽ bị dismiss vì component bị unmount/mount lại)
+const InputField = ({ icon, label, value, onChangeText, placeholder, keyboardType = 'default' }) => (
+  <View style={styles.inputSection}>
+    <Text style={styles.inputLabel} allowFontScaling={false}>{label}</Text>
+    <View style={styles.inputGroup}>
+      <View style={styles.inputIconWrapper}>
+        {icon}
+      </View>
+      <TextInput
+        style={styles.input}
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor="#64748B"
+        keyboardType={keyboardType}
+      />
+    </View>
+  </View>
+);
+
 const UserEditScreen = ({ route, navigation }) => {
   const { userId } = route.params;
   const [loading, setLoading] = useState(true);
@@ -91,24 +112,6 @@ const UserEditScreen = ({ route, navigation }) => {
     });
   };
 
-  const InputField = ({ icon, label, value, onChangeText, placeholder, keyboardType = 'default' }) => (
-    <View style={styles.inputSection}>
-      <Text style={styles.inputLabel} allowFontScaling={false}>{label}</Text>
-      <View style={styles.inputGroup}>
-        <View style={styles.inputIconWrapper}>
-          {icon}
-        </View>
-        <TextInput
-          style={styles.input}
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          placeholderTextColor="#64748B"
-          keyboardType={keyboardType}
-        />
-      </View>
-    </View>
-  );
 
   if (loading) {
     return (

@@ -22,6 +22,7 @@ import com.tuvi.tuvi_backend.enums.OrderStatus;
 import com.tuvi.tuvi_backend.repository.CartItemRepository;
 import com.tuvi.tuvi_backend.repository.OrderItemRepository;
 import com.tuvi.tuvi_backend.repository.OrderRepository;
+import com.tuvi.tuvi_backend.repository.ReviewRepository;
 import com.tuvi.tuvi_backend.repository.UserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,6 +38,7 @@ public class OrderService {
     final OrderItemRepository orderItemRepository;
     final CartItemRepository cartItemRepository;
     final UserRepository userRepository;
+    final ReviewRepository reviewRepository;
     final HttpServletRequest httpServletRequest;
 
     @Value("${vqr.bankId}")
@@ -182,13 +184,24 @@ public class OrderService {
 
     private OrderResponse mapToOrderResponse(Order order, List<OrderItem> items, String paymentUrl) {
         List<OrderResponse.OrderItemResponse> itemResponses = (items == null) ? Collections.emptyList() : items.stream()
-                .map(item -> OrderResponse.OrderItemResponse.builder()
+                .map(item -> {
+                    boolean isReviewed = false;
+                    if (order.getUser() != null && item.getProduct() != null) {
+                        isReviewed = reviewRepository.existsByUserIdAndProductIdAndOrderId(
+                                order.getUser().getId(), 
+                                item.getProduct().getId(), 
+                                order.getId()
+                        );
+                    }
+                    return OrderResponse.OrderItemResponse.builder()
                         .productId(item.getProduct() != null ? item.getProduct().getId() : null)
                         .productName(item.getProduct() != null ? item.getProduct().getName() : "Unknown Product")
                         .productImageUrl(item.getProduct() != null ? item.getProduct().getImageUrl() : null)
                         .quantity(item.getQuantity())
                         .price(item.getPrice())
-                        .build())
+                        .isReviewed(isReviewed)
+                        .build();
+                })
                 .collect(Collectors.toList());
 
         return OrderResponse.builder()

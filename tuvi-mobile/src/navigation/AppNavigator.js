@@ -31,6 +31,7 @@ import ChatScreen from '../screens/ChatScreen';
 import AdminHomeScreen from '../screens/AdminHomeScreen';
 import UserManagementScreen from '../screens/UserManagementScreen';
 import UserEditScreen from '../screens/UserEditScreen';
+import UserCreateScreen from '../screens/UserCreateScreen';
 import PostManagementScreen from '../screens/PostManagementScreen';
 import ReportedPostsScreen from '../screens/ReportedPostsScreen';
 import PostDetailScreen from '../screens/PostDetailScreen';
@@ -199,6 +200,7 @@ const AppNavigator = () => {
         <Stack.Screen name="AdminMain" component={AdminHomeScreen} />
         <Stack.Screen name="UserManagement" component={UserManagementScreen} />
         <Stack.Screen name="UserEdit" component={UserEditScreen} />
+        <Stack.Screen name="UserCreate" component={UserCreateScreen} />
         <Stack.Screen name="PostManagement" component={PostManagementScreen} />
         <Stack.Screen name="ReportedPosts" component={ReportedPostsScreen} />
         <Stack.Screen name="PostDetail" component={PostDetailScreen} />

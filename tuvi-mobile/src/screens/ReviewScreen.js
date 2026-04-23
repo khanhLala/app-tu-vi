@@ -9,7 +9,7 @@ import { ArrowLeft, Star, Send } from 'lucide-react-native';
 import reviewApi from '../api/reviewApi';
 
 const ReviewScreen = ({ route, navigation }) => {
-  const { productId, productName } = route.params;
+  const { productId, productName, orderId } = route.params;
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,6 +24,7 @@ const ReviewScreen = ({ route, navigation }) => {
     try {
       await reviewApi.createReview({
         productId,
+        orderId,
         rating,
         comment: comment.trim(),
       });
@@ -31,7 +32,7 @@ const ReviewScreen = ({ route, navigation }) => {
         { text: 'OK', onPress: () => navigation.goBack() }
       ]);
     } catch (e) {
-      Alert.alert('Lỗi', e.response?.data?.message || 'Không thể gửi đánh giá.');
+      Alert.alert('Lỗi', e.response?.data?.message || 'Bạn đã đánh giá rồi!');
     } finally {
       setLoading(false);
     }

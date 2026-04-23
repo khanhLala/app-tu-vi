@@ -35,5 +35,6 @@ public class OrderResponse {
         String productImageUrl;
         int quantity;
         BigDecimal price;
+        boolean isReviewed;
     }
 }

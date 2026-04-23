@@ -21,6 +21,7 @@ public enum ErrorCode {
     PASSWORD_INCORRECT(1009, "Mật khẩu cũ không chính xác", HttpStatus.BAD_REQUEST),
     PASSWORDS_NOT_MATCH(1010, "Mật khẩu xác nhận không khớp", HttpStatus.BAD_REQUEST),
     POST_NOT_EXISTED(1011, "Bài viết không tồn tại", HttpStatus.NOT_FOUND),
+    CANNOT_REPORT_OWN_POST(1012, "Bạn không thể tự báo cáo bài viết của mình", HttpStatus.BAD_REQUEST),
     ;
 
 

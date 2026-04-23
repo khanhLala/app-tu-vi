@@ -26,6 +26,10 @@ public class Review {
     @JoinColumn(name = "user_id", nullable = false)
     User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    Order order;
+
     @Column(name = "rating", nullable = false)
     Integer rating;
 

@@ -138,14 +138,28 @@ const OrderHistoryScreen = ({ navigation }) => {
                 </View>
                 {item.status === 'COMPLETED' && (
                   <TouchableOpacity 
-                    style={styles.reviewItemBtn}
+                    style={[
+                      styles.reviewItemBtn, 
+                      orderItem.isReviewed && styles.reviewedBtn
+                    ]}
                     onPress={() => navigation.navigate('Review', { 
                       productId: orderItem.productId, 
-                      productName: orderItem.productName 
+                      productName: orderItem.productName,
+                      orderId: item.id
                     })}
+                    disabled={orderItem.isReviewed}
                   >
-                    <Star size={12} color="#0F172A" fill="#0F172A" />
-                    <Text style={styles.reviewItemBtnText}>Đánh giá</Text>
+                    <Star 
+                      size={12} 
+                      color={orderItem.isReviewed ? "#94A3B8" : "#0F172A"} 
+                      fill={orderItem.isReviewed ? "#94A3B8" : "#0F172A"} 
+                    />
+                    <Text style={[
+                      styles.reviewItemBtnText,
+                      orderItem.isReviewed && styles.reviewedBtnText
+                    ]}>
+                      {orderItem.isReviewed ? 'Đã đánh giá' : 'Đánh giá'}
+                    </Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -278,6 +292,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FBBF24', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 
   },
   reviewItemBtnText: { color: '#0F172A', fontSize: 11, fontWeight: 'bold' },
+  reviewedBtn: { backgroundColor: 'rgba(148, 163, 184, 0.1)', borderWidth: 1, borderColor: '#334155' },
+  reviewedBtnText: { color: '#94A3B8' },
   priceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   totalLabel: { color: '#F8FAFC', fontSize: 14 },
   totalValue: { color: '#FBBF24', fontSize: 16, fontWeight: 'bold' },

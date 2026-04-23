@@ -44,7 +44,7 @@ const PostDetailScreen = ({ route, navigation }) => {
 
   const handleDeletePost = async () => {
     Alert.alert(
-      'Xác nhận xóa',
+      'Xác nhận xóa bài viết',
       'Bạn có chắc chắn muốn xóa bài viết này?',
       [
         { text: 'Hủy', style: 'cancel' },
@@ -54,15 +54,13 @@ const PostDetailScreen = ({ route, navigation }) => {
           onPress: async () => {
             setProcessing(true);
             try {
+              // Soft delete: backend đánh dấu isDeleted=true và tự động RESOLVED các báo cáo
               await axiosClient.delete(`/posts/${postId}`);
-              // Nếu có reportId, hãy cập nhật trạng thái report luôn
-              if (reportId) {
-                await axiosClient.put(`/reports/${reportId}/status`, null, { params: { status: 'RESOLVED' } });
-              }
-              Alert.alert('Thành công', 'Bài viết đã được xóa và báo cáo đã được xử lý.');
+              Alert.alert('Thành công', 'Bài viết đã được ẩn và các báo cáo đã được xử lý.');
               navigation.goBack();
             } catch (error) {
-              Alert.alert('Lỗi', 'Không thể xóa bài viết.');
+              console.log('Delete post error:', error);
+              Alert.alert('Lỗi', 'Không thể xóa bài viết. Vui lòng thử lại.');
             } finally {
               setProcessing(false);
             }

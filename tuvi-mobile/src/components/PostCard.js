@@ -97,13 +97,15 @@ const PostCard = ({ post, onLike, onReport, onDelete, onComment, currentUserId, 
                     <Trash2 color="#EF4444" size={18} />
                 </TouchableOpacity>
             )}
-            <TouchableOpacity 
-              style={styles.reportBtn} 
-              onPress={() => setReportModalVisible(true)}
-            >
-                <AlertCircle color="#64748B" size={18} />
-                <Text style={styles.reportText}>Báo cáo</Text>
-            </TouchableOpacity>
+            {!isAuthor && (
+                <TouchableOpacity 
+                  style={styles.reportBtn} 
+                  onPress={() => setReportModalVisible(true)}
+                >
+                    <AlertCircle color="#64748B" size={18} />
+                    <Text style={styles.reportText}>Báo cáo</Text>
+                </TouchableOpacity>
+            )}
         </View>
       </View>
 
