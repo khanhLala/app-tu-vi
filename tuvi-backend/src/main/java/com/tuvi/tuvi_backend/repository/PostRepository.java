@@ -9,7 +9,13 @@ import java.util.List;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, String> {
-    List<Post> findAllByOrderByCreatedAtDesc();
-    long countByCreatedAtAfter(LocalDateTime date);
+    // Chỉ lấy bài viết chưa bị xóa mềm (isDeleted = false)
+    List<Post> findAllByIsDeletedFalseOrderByCreatedAtDesc();
+
+    // Đếm bài viết mới trong khoảng thời gian (chỉ bài chưa xóa)
+    long countByCreatedAtAfterAndIsDeletedFalse(LocalDateTime date);
+
+    // Đếm tổng số bài viết chưa xóa
+    long countByIsDeletedFalse();
 }
 

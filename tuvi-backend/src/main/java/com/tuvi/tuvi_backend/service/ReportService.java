@@ -32,13 +32,18 @@ public class ReportService {
     }
 
     private ReportResponse mapToReportResponse(Report report) {
+        String postId = report.getPost().getId();
+        String postContent = report.getPost().isDeleted()
+                ? "[Bài viết đã bị xóa]"
+                : report.getPost().getContent().substring(0, Math.min(report.getPost().getContent().length(), 100));
+
         return ReportResponse.builder()
                 .id(report.getId())
                 .reason(report.getReason())
                 .reporterName(report.getReporter().getFirstName() + " " + report.getReporter().getLastName())
                 .reporterUsername(report.getReporter().getUsername())
-                .postId(report.getPost().getId())
-                .postContentPreview(report.getPost().getContent().substring(0, Math.min(report.getPost().getContent().length(), 100)))
+                .postId(postId)
+                .postContentPreview(postContent)
                 .status(report.getStatus())
                 .createdAt(report.getCreatedAt())
                 .build();

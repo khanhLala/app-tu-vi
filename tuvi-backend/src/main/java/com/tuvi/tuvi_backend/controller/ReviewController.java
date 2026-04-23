@@ -33,9 +33,9 @@ public class ReviewController {
     }
 
     @GetMapping("/eligibility/{productId}")
-    public ApiResponse<Boolean> checkEligibility(@PathVariable String productId) {
+    public ApiResponse<Boolean> checkEligibility(@PathVariable String productId, @RequestParam String orderId) {
         return ApiResponse.<Boolean>builder()
-                .result(reviewService.checkEligibility(productId))
+                .result(reviewService.checkEligibility(productId, orderId))
                 .build();
     }
 }

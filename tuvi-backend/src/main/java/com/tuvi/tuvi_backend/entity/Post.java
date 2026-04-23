@@ -40,9 +40,14 @@ public class Post {
     @Builder.Default
     boolean isReported = false;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    // Soft delete: đánh dấu xóa thay vì xóa khỏi DB
+    @Builder.Default
+    @Column(name = "is_deleted", nullable = false)
+    boolean isDeleted = false;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Comment> comments;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Like> likes;
 }

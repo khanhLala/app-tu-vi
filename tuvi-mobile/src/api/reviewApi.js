@@ -2,7 +2,7 @@ import axiosClient from './axiosClient';
 
 const reviewApi = {
   getReviewsByProduct: (productId) => axiosClient.get(`reviews/product/${productId}`),
-  checkEligibility: (productId) => axiosClient.get(`reviews/eligibility/${productId}`),
+  checkEligibility: (productId, orderId) => axiosClient.get(`reviews/eligibility/${productId}?orderId=${orderId}`),
   createReview: (data) => axiosClient.post('reviews', data),
 };
 

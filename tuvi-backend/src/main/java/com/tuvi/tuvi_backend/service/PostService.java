@@ -69,7 +69,8 @@ public class PostService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username).orElse(null);
 
-        return postRepository.findAllByOrderByCreatedAtDesc().stream()
+        // Chỉ lấy bài viết chưa xóa mềm
+        return postRepository.findAllByIsDeletedFalseOrderByCreatedAtDesc().stream()
                 .map(post -> mapToPostResponse(post, user))
                 .collect(Collectors.toList());
     }
@@ -131,7 +132,18 @@ public class PostService {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
-        postRepository.delete(post);
+        // Xóa mềm: đánh dấu isDeleted = true thay vì xóa khỏi DB
+        post.setDeleted(true);
+        postRepository.save(post);
+
+        // Cập nhật tất cả báo cáo PENDING của bài này thành RESOLVED
+        List<com.tuvi.tuvi_backend.entity.Report> pendingReports =
+                reportRepository.findAllByStatusOrderByCreatedAtDesc(com.tuvi.tuvi_backend.enums.ReportStatus.PENDING)
+                        .stream()
+                        .filter(r -> r.getPost().getId().equals(postId))
+                        .collect(Collectors.toList());
+        pendingReports.forEach(r -> r.setStatus(com.tuvi.tuvi_backend.enums.ReportStatus.RESOLVED));
+        reportRepository.saveAll(pendingReports);
     }
 
     private PostResponse mapToPostResponse(Post post, User currentUser) {
@@ -184,6 +196,11 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXISTED));
 
+        // Kiểm tra: Người dùng không thể tự báo cáo bài viết của chính mình
+        if (post.getAuthor().getId().equals(reporter.getId())) {
+            throw new AppException(ErrorCode.CANNOT_REPORT_OWN_POST);
+        }
+
         Report report = Report.builder()
                 .post(post)
                 .reporter(reporter)
@@ -195,7 +212,8 @@ public class PostService {
     }
 
     public List<PostResponse> getAllPosts() {
-        return postRepository.findAllByOrderByCreatedAtDesc().stream()
+        // Admin xem danh sách: chỉ hiển thị bài chưa xóa mềm
+        return postRepository.findAllByIsDeletedFalseOrderByCreatedAtDesc().stream()
                 .map(post -> mapToPostResponse(post, null))
                 .collect(Collectors.toList());
     }

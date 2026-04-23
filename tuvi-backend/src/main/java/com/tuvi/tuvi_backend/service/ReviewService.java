@@ -39,23 +39,24 @@ public class ReviewService {
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        // Rule 1: Must have a COMPLETED order with this product
-        boolean hasPurchased = orderRepository.hasPurchasedProduct(user.getId(), OrderStatus.COMPLETED, product.getId());
+        com.tuvi.tuvi_backend.entity.Order order = orderRepository.findById(request.getOrderId())
+                .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        if (!hasPurchased) {
-            System.out.println("Review rejection: User " + username + " (ID: " + user.getId() + ") has not purchased product " + product.getName() + " (ID: " + product.getId() + ") with COMPLETED status.");
-            throw new RuntimeException("You can only review products you have purchased and received.");
+        // Rule 1: Must belong to this user and be COMPLETED
+        if (!order.getUser().getId().equals(user.getId()) || order.getStatus() != OrderStatus.COMPLETED) {
+            throw new RuntimeException("You can only review products from your completed orders.");
         }
 
-        // Rule 2: One review per user per product
-        boolean hasReviewed = reviewRepository.existsByUserIdAndProductId(user.getId(), product.getId());
+        // Rule 2: One review per product per order
+        boolean hasReviewed = reviewRepository.existsByUserIdAndProductIdAndOrderId(user.getId(), product.getId(), order.getId());
         if (hasReviewed) {
-            throw new RuntimeException("You have already reviewed this product.");
+            throw new RuntimeException("You have already reviewed this product for this order.");
         }
 
         Review review = Review.builder()
                 .user(user)
                 .product(product)
+                .order(order)
                 .rating(request.getRating())
                 .comment(request.getComment())
                 .build();
@@ -70,21 +71,21 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    public boolean checkEligibility(String productId) {
+    public boolean checkEligibility(String productId, String orderId) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if ("anonymousUser".equals(username)) return false;
 
         User user = userRepository.findByUsername(username).orElse(null);
         if (user == null) return false;
 
-        Product product = productRepository.findById(productId).orElse(null);
-        if (product == null) return false;
+        com.tuvi.tuvi_backend.entity.Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null || !order.getUser().getId().equals(user.getId()) || order.getStatus() != OrderStatus.COMPLETED) {
+            return false;
+        }
 
-        boolean hasPurchased = orderRepository.hasPurchasedProduct(user.getId(), OrderStatus.COMPLETED, product.getId());
+        boolean hasReviewed = reviewRepository.existsByUserIdAndProductIdAndOrderId(user.getId(), productId, orderId);
 
-        boolean hasReviewed = reviewRepository.existsByUserIdAndProductId(user.getId(), product.getId());
-
-        return hasPurchased && !hasReviewed;
+        return !hasReviewed;
     }
 
     private ReviewResponse mapToReviewResponse(Review review) {
